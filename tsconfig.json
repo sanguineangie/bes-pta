@@ -1,0 +1,49 @@
+{
+  "extends": "astro/tsconfigs/base",
+
+  // Include src/ for project files, plus both generated type files from .astro/:
+  //   types.d.ts    — Astro globals (Astro.props, import.meta.env, etc.)
+  //   content.d.ts  — astro:content module with typed collection entries
+  // Astro regenerates these on every `astro dev` / `astro build`.
+  "include": ["src", ".astro/types.d.ts", ".astro/content.d.ts"],
+
+  "compilerOptions": {
+    // Core module settings (must be inline for VS Code TS server).
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "jsx": "preserve",
+    "forceConsistentCasingInFileNames": true,
+
+    // baseUrl lets path aliases below be written relative to src/.
+    "baseUrl": "src",
+
+    "strictNullChecks": true,
+    "allowJs": true,
+
+    // Path aliases — use these instead of deep relative imports.
+    // Example: import Button from '@components/Button.astro'
+    //
+    // Keep this list in sync with any aliases added in astro.config.mjs
+    // if you configure Vite resolve.alias for runtime bundling as well.
+    "paths": {
+      "@components/*": ["components/*"],
+      "@layouts/*":    ["layouts/*"],
+      "@assets/*":     ["assets/*"],
+      "@content/*":    ["content/*"],
+      "@pages/*":      ["pages/*"]
+    },
+
+    "plugins": [
+      // Enables TypeScript IntelliSense inside .astro files in VS Code.
+      { "name": "@astrojs/ts-plugin" }
+    ]
+  }
+}

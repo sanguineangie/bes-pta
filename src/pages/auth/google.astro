@@ -1,0 +1,42 @@
+---
+/**
+ * Google OAuth initiation endpoint.
+ *
+ * This page initiates the Google OAuth PKCE flow server-side.
+ * By handling it as a page redirect (not a fetch-based action),
+ * the PKCE code verifier cookie is set directly on the response
+ * that the browser follows — guaranteeing it's available when
+ * the callback page exchanges the code.
+ *
+ * Flow:
+ *   1. Browser visits /auth/google (this page)
+ *   2. Server creates Supabase client, calls signInWithOAuth
+ *   3. Supabase sets PKCE code verifier cookie via setAll()
+ *   4. Server redirects browser to Google's consent screen
+ *   5. After consent, Google → Supabase → /auth/callback?code=xxx
+ *   6. Callback reads the code verifier cookie and exchanges for session
+ */
+import { createClient } from "../../lib/supabase";
+
+export const prerender = false;
+
+const supabase = createClient({
+  request: Astro.request,
+  cookies: Astro.cookies,
+});
+
+const origin = Astro.url.origin;
+
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: "google",
+  options: {
+    redirectTo: `${origin}/auth/callback`,
+  },
+});
+
+if (error || !data.url) {
+  return Astro.redirect(`/auth/signin?error=${encodeURIComponent(error?.message || "OAuth failed")}`);
+}
+
+return Astro.redirect(data.url);
+---

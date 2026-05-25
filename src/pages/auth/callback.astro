@@ -1,0 +1,48 @@
+---
+/**
+ * OAuth callback handler.
+ *
+ * After a user authenticates with Google (or any OAuth provider),
+ * Supabase redirects here with a `code` query param. We exchange
+ * it for a session, which sets auth cookies automatically.
+ *
+ * This page must always be server-rendered (no prerender).
+ */
+import { createClient } from "../../lib/supabase";
+
+export const prerender = false;
+
+// Supabase may redirect here with error params (PKCE sends as query params)
+const errorParam = Astro.url.searchParams.get("error_description")
+  || Astro.url.searchParams.get("error");
+
+if (errorParam) {
+  console.error("OAuth callback received error:", errorParam);
+  return Astro.redirect(
+    `/auth/signin?error=${encodeURIComponent(errorParam)}`
+  );
+}
+
+const code = Astro.url.searchParams.get("code");
+const next = Astro.url.searchParams.get("next") ?? "/dashboard";
+
+if (!code) {
+  return Astro.redirect("/auth/signin?error=missing-code");
+}
+
+const supabase = createClient({
+  request: Astro.request,
+  cookies: Astro.cookies,
+});
+
+const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+if (error) {
+  console.error("Auth callback error:", error.message);
+  return Astro.redirect(
+    `/auth/signin?error=${encodeURIComponent(error.message)}`
+  );
+}
+
+return Astro.redirect(next);
+---

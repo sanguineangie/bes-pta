@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import Container from '@components/elements/Container.astro';
+import Layout from '@layouts/Layout.astro';
+import Sectionhead from '@components/elements/Sectionhead.astro';
+
+type Post = CollectionEntry<'events'>;
+
+// Fetch all non-draft posts, newest first
+const events = (await getCollection('events', ({ data }) => !data.draft))
+  .sort((a: Post, b: Post) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<Layout title="Events" description="All posts">
+  <Container class="py-12 sm:py-16 lg:py-24">
+    <Sectionhead eyebrow="Content">
+      <Fragment slot="title">Events</Fragment>
+      <Fragment slot="desc">All posts, newest first.</Fragment>
+    
+    </Sectionhead>
+    <button class="btn btn-primary">Create Event</button>
+
+    <section class="mt-10 max-w-3xl">
+      {events.length === 0 && (
+        <div class="alert alert-info">
+          <span>No posts yet. Add a Markdown file to <code>src/content/events/</code>.</span>
+        </div>
+      )}
+
+      <ul class="flex flex-col gap-6">
+        {events.map((events: Post) => (
+          <li>
+            <a href={`/events/${events.id}`} class="card border border-base-300 bg-base-100 transition-shadow hover:shadow-md">
+              <div class="card-body gap-3">
+                <span class="badge badge-primary">{events.data.category}</span>
+                <h2 class="card-title">{events.data.title}</h2>
+                <p class="text-sm text-base-content/70">
+                  <time datetime={events.data.dateEvent.toISOString()}>
+                    {events.data.dateEvent.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </time>
+                </p>
+                <p>{events.data.description}</p>
+              </div>
+              
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </Container>
+</Layout>

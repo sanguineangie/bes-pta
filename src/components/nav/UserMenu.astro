@@ -1,0 +1,74 @@
+---
+/**
+ * UserMenu — avatar dropdown with auth actions.
+ *
+ * Shows:
+ *   - Logged in: user avatar (or initials fallback) + dropdown with "Dashboard" and "Sign out"
+ *   - Logged out: generic user icon + dropdown with "Sign in" and "Register"
+ *
+ * Placed in the Navbar, to the right of the ThemeToggle.
+ * Uses DaisyUI dropdown + avatar components.
+ */
+
+const user = Astro.locals.user;
+const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+const displayName = user?.user_metadata?.full_name || user?.user_metadata?.preferred_username || user?.email;
+const initials = displayName
+  ? displayName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+  : "?";
+---
+
+<div class="dropdown dropdown-end">
+  <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar" aria-label="User menu">
+    {user && avatarUrl ? (
+      <div class="w-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-1">
+        <img src={avatarUrl} alt={displayName || "User avatar"} referrerpolicy="no-referrer" />
+      </div>
+    ) : user ? (
+      <div class="w-8 h-8 rounded-full bg-neutral text-neutral-content flex items-center justify-center">
+        <span class="text-xs font-semibold leading-none">{initials}</span>
+      </div>
+    ) : (
+      <!-- Generic user icon for logged-out state -->
+      <div class="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+        </svg>
+      </div>
+    )}
+  </div>
+
+  <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-50 mt-3 w-52 p-2 shadow-lg">
+    {user ? (
+      <>
+        <li class="menu-title">
+          <span class="text-xs truncate">{displayName}</span>
+        </li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li>
+          <button id="usermenu-signout" class="text-error">Sign out</button>
+        </li>
+      </>
+    ) : (
+      <>
+        <li><a href="/auth/signin">Sign in</a></li>
+        <li><a href="/auth/signup">Register</a></li>
+      </>
+    )}
+  </ul>
+</div>
+
+{user && (
+  <script>
+    import { actions } from "astro:actions";
+
+    document.getElementById("usermenu-signout")?.addEventListener("click", async () => {
+      try {
+        await actions.signOut();
+        window.location.href = "/auth/signin";
+      } catch (e) {
+        console.error("Sign out failed", e);
+      }
+    });
+  </script>
+)}

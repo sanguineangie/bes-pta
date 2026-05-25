@@ -1,0 +1,60 @@
+---
+/**
+ * Dashboard — protected page.
+ *
+ * Middleware ensures only authenticated users reach this page
+ * and populates `Astro.locals.user`.
+ */
+import Layout from "../layouts/Layout.astro";
+
+const user = Astro.locals.user!;
+---
+
+<Layout title="Dashboard">
+  <div class="container mx-auto max-w-2xl px-4 py-12">
+    <div class="card bg-base-200 shadow-xl">
+      <div class="card-body">
+        <h1 class="card-title text-2xl">Welcome!</h1>
+        <p class="text-base-content/70">
+          Signed in as <strong>{user.email}</strong>
+        </p>
+        <p class="text-xs text-base-content/50">User ID: {user.id}</p>
+
+        <div class="card-actions justify-end mt-6">
+          <button id="signout-btn" class="btn btn-outline btn-error">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { actions } from "astro:actions";
+
+  const btn = document.getElementById("signout-btn") as HTMLButtonElement;
+
+  btn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = "Signing out...";
+
+    try {
+      const result = await actions.signOut();
+
+      if (!result.data?.success) {
+        btn.disabled = false;
+        btn.textContent = "Sign Out";
+        alert("Failed to sign out");
+        return;
+      }
+
+      window.location.href = "/auth/signin";
+    } catch (error) {
+      btn.disabled = false;
+      btn.textContent = "Sign Out";
+      console.error(error);
+    }
+  });
+</script>
