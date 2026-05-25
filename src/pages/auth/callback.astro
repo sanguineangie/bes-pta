@@ -1,0 +1,72 @@
+---
+
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+
+// This page must always be server-rendered
+
+export const prerender = false
+
+const code = Astro.url.searchParams.get('code')
+const next = Astro.url.searchParams.get('next') ?? '/'
+
+if (!code) {
+  return Astro.redirect('/auth/error?message=missing-code')
+}
+
+const supabaseUrl = import.meta.env.PUBLIC_USPABASE_URL
+const supabaseKey = import.meta.env.PUBLIC_PUBLISHABLE_KEY
+
+if (!supabaseUrl || !supabaseKey){
+  throw new Error(
+    'Missing Supabase env vars.'
+  )
+}
+
+const supabase = createServerClient(
+  import.meta.env.PUBLIC_SUPABASE_URL,
+
+  import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+
+  {
+
+    cookies: {
+
+      getAll() {
+
+        return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
+
+      },
+
+      setAll(cookiesToSet) {
+
+        cookiesToSet.forEach(({ name, value, options }) => {
+
+          Astro.cookies.set(name, value, options)
+
+        })
+
+      },
+
+    },
+
+  }
+
+)
+
+ 
+
+const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+ 
+
+if (error) {
+
+  console.error('Auth callback error:', error.message)
+
+  return Astro.redirect(`/auth/error?message=${encodeURIComponent(error.message)}`)
+
+}
+
+ 
+
+return Astro.redirect(next)

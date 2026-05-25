@@ -1,0 +1,60 @@
+name: Release
+
+# Triggered by pushing a version tag, e.g.: git push && git push --tags
+# This workflow:
+#   1. Verifies that package.json already matches the pushed git tag
+#   2. Creates a GitHub Release with auto-generated release notes
+#
+# Recommended release flow:
+#   pnpm release:patch|minor|major   ← runs checks, confirms, then calls pnpm version
+#   git push && git push --tags      ← triggers this workflow
+#
+# The release workflow is intentionally read-only with respect to repository
+# state. If package.json and the tag disagree, fail loudly instead of mutating
+# main from CI.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Fetch full history so GitHub can generate complete release notes.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Validate tag matches package.json version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          echo "Tag version: $TAG_VERSION"
+          echo "package.json version: $PACKAGE_VERSION"
+
+          if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
+            echo "Release tag and package.json version do not match."
+            echo "Update package.json locally with pnpm release:* or pnpm version before pushing the tag."
+            exit 1
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
