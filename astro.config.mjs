@@ -4,15 +4,14 @@ import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import tailwindcss from "@tailwindcss/vite";
 import alpinejs from "@astrojs/alpinejs";
-import node from '@astrojs/node'
-
+import vercel from "@astrojs/vercel";
 
 // https://astro.build/config
 export default defineConfig({
   // Keep `site` driven by validated env so sitemap and canonical URLs stay correct.
   site: process.env.PUBLIC_SITE_URL || "http://localhost:4321",
   output: 'server',
-  adapter: node({mode: "standalone"}),
+  adapter: vercel(),
   trailingSlash: "never",
   env: {
     schema: {
