@@ -223,13 +223,19 @@
 </div>
 
 <div class="container" id="figure-3" style="display:none">
-  <h2>Figure 3 — Teacher Allocation Scenarios: Worst-Grade Student/Teacher Ratio</h2>
+  <h2>Figure 3 — Teacher Allocation Scenarios: Worst-Grade Student/Teacher Ratio (Grades 1–4)</h2>
   <p class="note">
     <strong>Actual Staffing</strong> = recorded allocation each year. &nbsp;
     <strong>Optimal — Actual Teachers</strong> = same headcount redistributed to minimise the worst grade ratio (greedy min-max). &nbsp;
     <strong>Uniform — Max Teachers</strong> = maximum historical total distributed equally across grades. &nbsp;
     <strong>Optimal — Max Teachers</strong> = maximum historical total redistributed optimally.
     Dashed bars = CSR-based projections (2026-27, 2027-28).
+  </p>
+  <p class="note">
+    <strong>Note:</strong> Kindergarten is excluded from worst-grade threshold determination and scenario comparison.
+    The UMASD Kindergarten threshold of 18 students per teacher is breached across nearly every school in nearly
+    every year regardless of allocation strategy — a structural pattern that warrants separate analysis.
+    Kindergarten columns in Figure 3c are shown in grey and labelled <em>excl.</em>
   </p>
   <div class="legend-box">
     <div class="legend-item"><div class="legend-swatch" style="background:#ef4444;"></div>Actual Staffing</div>
@@ -289,14 +295,15 @@ function getCSRRows(school){
       proj1:Math.round(actual*mu),proj2:Math.round(actual*mu*mu)};
   });
 }
-function gradeThreshold(gradeName){
+function isKinder(gradeName){
   const n=gradeName.toLowerCase();
-  if(n.includes('kinder')||n==='k') return 18;
-  const m=n.match(/(\d+)/);
+  return n.includes('kinder')||n==='k';
+}
+function gradeThreshold(gradeName){
+  if(isKinder(gradeName)) return 18; // kept for K display only — excluded from scenario analysis
+  const m=gradeName.match(/(\d+)/);
   if(!m) return 25;
-  const g=parseInt(m[1]);
-  if(g<=2) return 23;
-  return 25;
+  return parseInt(m[1])<=2?23:25;
 }
 function optimalAlloc(enrollments, totalTeachers){
   const n=enrollments.length;
@@ -310,9 +317,12 @@ function optimalAlloc(enrollments, totalTeachers){
   }
   return t;
 }
+// Excludes Kindergarten — K breaches systemically across all schools/years
+// regardless of allocation strategy and is treated as a separate structural issue.
 function maxExcessRatio(gNames, enrollments, alloc){
   let wi=0, we=-Infinity;
   enrollments.forEach((e,i)=>{
+    if(isKinder(gNames[i])) return; // exclude K from worst-grade determination
     const excess=(e/alloc[i])-gradeThreshold(gNames[i]);
     if(excess>we){we=excess;wi=i;}
   });
@@ -321,6 +331,7 @@ function maxExcessRatio(gNames, enrollments, alloc){
 function worstGrade(gNames, enrollments, alloc){
   let wi=0, we=-Infinity;
   enrollments.forEach((e,i)=>{
+    if(isKinder(gNames[i])) return; // exclude K
     const excess=(e/alloc[i])-gradeThreshold(gNames[i]);
     if(excess>we){we=excess;wi=i;}
   });
@@ -729,6 +740,11 @@ async function init(){
       const tr=document.createElement('tr');
       if(r.isProj) tr.style.background='#f5f3ff';
       const ratioCell=(ratio,worst)=>{
+        if(isKinder(worst)){
+          // K excluded from scenario threshold analysis — show greyed with note
+          return `<td class="col-ratio" style="text-align:center;font-weight:700;background:#f3f4f6;color:#9ca3af;">${ratio.toFixed(1)}<span style="font-size:9px"> excl.</span></td>`
+            +`<td class="col-worst" style="text-align:center;font-size:10px;color:#9ca3af;">${abbr(worst)}</td>`;
+        }
         const threshold=gradeThreshold(worst);
         const over=ratio-threshold;
         const col=over>0?'#dc2626':over>-3?'#d97706':'#16a34a';
@@ -736,7 +752,11 @@ async function init(){
         return `<td class="col-ratio" style="text-align:center;font-weight:700;background:${bg};color:${col};">${ratio.toFixed(1)}<span style="font-size:9px;opacity:0.7">/${threshold}</span></td>`
           +`<td class="col-worst" style="text-align:center;font-size:10px;color:#64748b;">${abbr(worst)}</td>`;
       };
-      const allocCells=(alloc,cls)=>alloc.map(t=>`<td class="col-alloc ${cls}" style="text-align:center;">${t}</td>`).join('');
+      const allocCells=(alloc,cls)=>alloc.map((t,i)=>{
+        const dimK=isKinder(gNames[i]);
+        const style=dimK?'text-align:center;color:#9ca3af;':'text-align:center;';
+        return `<td class="col-alloc ${cls}" style="${style}">${t}</td>`;
+      }).join('');
       const shortYr=s=>s.replace(/\d{2}(\d{2})-\d{2}/,'\'$1');
       const year=r.isProj
         ?`<em style="color:#7c3aed;">P${shortYr(r.year.replace('Proj ',''))}</em>`
@@ -788,7 +808,8 @@ async function init(){
         x:{ticks:{font:{size:9},maxRotation:55}}}},
     plugins:[{id:'refThresholds',afterDraw(chart){
       const{ctx,chartArea:{left,right},scales:{y}}=chart;
-      [{val:18,label:'K: 18',color:'#7c3aed'},{val:23,label:'G1–2: 23',color:'#d97706'},{val:25,label:'G3+: 25',color:'#dc2626'}]
+      // K threshold excluded from scenario analysis — only G1-2 and G3+ shown
+      [{val:23,label:'G1–2: 23',color:'#d97706'},{val:25,label:'G3+: 25',color:'#dc2626'}]
         .forEach(({val,label,color})=>{
           const yp=y.getPixelForValue(val);
           if(yp<chart.chartArea.top||yp>chart.chartArea.bottom) return;

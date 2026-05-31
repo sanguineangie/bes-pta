@@ -44,3 +44,15 @@
   --callout-border: #475569;
   --callout-text:   #e2e8f0;
 }
+/* ── MDX callout boxes ───────────────────────────────────────────────────── */
+:root {
+  --callout-bg:     #f3f4f6;
+  --callout-border: #9ca3af;
+  --callout-text:   #111827;
+}
+
+[data-theme="dark"] {
+  --callout-bg:     #1e293b;
+  --callout-border: #475569;
+  --callout-text:   #e2e8f0;
+}

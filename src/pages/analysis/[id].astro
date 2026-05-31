@@ -27,7 +27,7 @@ const { Content } = await render(post);
 
 <Layout title={post.data.title} description={post.data.description}>
   <Container class="py-12 sm:py-16 lg:py-24">
-    <article class="max-w-3xl">
+    <article class="max-w-5xl">
       <header class="space-y-4">
         <a href="/analysis" class="link link-hover text-sm text-base-content/60">← All data & analysis</a>
 
@@ -70,7 +70,7 @@ const { Content } = await render(post);
       plugin for rich text. `prose` gives Markdown content predictable defaults
       without maintaining a custom article stylesheet in the starter.
     -->
-      <div class="prose prose-neutral mt-10 max-w-none prose-a:link prose-img:rounded-box">
+      <div class="prose prose-neutral dark:prose-invert mt-10 max-w-none prose-a:link prose-img:rounded-box">
         <Content />
 
       </div>      
