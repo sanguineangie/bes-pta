@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import Container from '@components/elements/Container.astro';
+import Layout from '@layouts/Layout.astro';
+import Sectionhead from '@components/elements/Sectionhead.astro';
+
+type Post = CollectionEntry<'analysis'>;
+
+// Fetch all non-draft posts, newest first
+const analysis = (await getCollection('analysis', ({ data }) => !data.draft))
+  .sort((a: Post, b: Post) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf());
+---
+
+<Layout title="analysis" description="All posts">
+  <Container class="py-12 sm:py-16 lg:py-24">
+    <Sectionhead eyebrow="Content">
+      <Fragment slot="title">Data & Analysis</Fragment>
+      <Fragment slot="desc">All claims, conclusions, and supporting data.</Fragment>
+    
+    </Sectionhead>
+
+    <section class="mt-10 max-w-3xl">
+      {analysis.length === 0 && (
+        <div class="alert alert-info">
+          <span>No posts yet. Add a Markdown file to <code>src/content/analysis/</code>.</span>
+        </div>
+      )}
+
+      <ul class="flex flex-col gap-6">
+        {analysis.map((analysis: Post) => (
+          <li>
+            <a href={`/analysis/${analysis.id}`} class="card border border-base-300 bg-base-100 transition-shadow hover:shadow-md">
+              <div class="card-body gap-3">
+                <h2 class="card-title">Claim: {analysis.data.title}</h2>
+                <span>{analysis.data.status}</span>
+                <p class="text-sm text-base-content/70">
+                  <time datetime={analysis.data.publishedDate.toISOString()}>
+                    {analysis.data.publishedDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </time>
+                </p>
+                
+                <p>{analysis.data.description}</p>
+              </div>
+              
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </Container>
+</Layout>

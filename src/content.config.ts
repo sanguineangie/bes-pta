@@ -15,7 +15,7 @@
  */
 
 import { defineCollection } from 'astro:content';
-import { glob,file } from 'astro/loaders';
+import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 // ---------------------------------------------------------------------------
@@ -26,6 +26,10 @@ import { z } from 'astro/zod';
 const seoFields = z.object({
   title: z.string(),
   description: z.string(),
+  publishedDate: z.coerce.date(),
+  updatedDate: z.coerce.date().optional(),
+  createdBy:z.string(),
+  updatedBy:z.string().optional()
 });
 
 // ---------------------------------------------------------------------------
@@ -36,18 +40,16 @@ const seoFields = z.object({
 // Remove this collection if you don't need a blog.
 // ---------------------------------------------------------------------------
 
-const blog = defineCollection({
-  // glob() scans a directory and creates one entry per matched file.
-  // The entry `id` is the filename without extension (e.g. "my-first-post").
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
+// const blog = defineCollection({
+//   // glob() scans a directory and creates one entry per matched file.
+//   // The entry `id` is the filename without extension (e.g. "my-first-post").
+//   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
 
-  schema: seoFields.extend({
-    pubDate: z.coerce.date(),           // accepts ISO strings: "2024-01-15"
-    updatedDate: z.coerce.date().optional(),
-    heroImage: z.string().optional(),   // relative path or remote URL
-    draft: z.boolean().default(false),  // draft: true → excluded from getCollection()
-  }),
-});
+//   schema: seoFields.extend({
+//     heroImage: z.string().optional(),   // relative path or remote URL
+//     draft: z.boolean().default(false),  // draft: true → excluded from getCollection()
+//   }),
+// });
 
 // ---------------------------------------------------------------------------
 // Add more collections below as your project grows, for example:
@@ -60,21 +62,34 @@ const blog = defineCollection({
 // Then register each one in the `collections` export.
 // ---------------------------------------------------------------------------
 
+const analysis = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/analysis' }),
+
+  schema: seoFields.extend({
+    status: z.string(),
+    conclusion: z.string()
+  }),
+});
+
 const events = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/events' }),
 
   schema: seoFields.extend({
-    datePub: z.coerce.date(),
-    dateEvent: z.coerce.date(),
-    dateMod: z.coerce.date(),
-    createdBy:z.string(),
+    eventDate: z.coerce.date(),
     category: z.string(),
     location: z.string(),
-    summary: z.string()
+  }),
+});
+
+const sources = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/sources' }),
+
+  schema: seoFields.extend({
+    type: z.string(),
+    url: z.string(),
   }),
 });
 
 export const collections = {
-  blog,
-  events
+  analysis,events,sources
 };

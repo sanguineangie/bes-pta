@@ -1,0 +1,55 @@
+{
+  "years": ["2020-21", "2021-22", "2022-23", "2023-24", "2024-25", "2025-26"],
+  "schools": [
+    {
+      "name": "Bridgeport",
+      "grades": {
+        "Kindergarten": { "students": [49, 63, 46, 51, 48, 52], "teachers": [3, 3, 3, 3, 3, 3] },
+        "Grade 1":      { "students": [62, 44, 64, 49, 49, 54], "teachers": [3, 3, 4, 3, 3, 3] },
+        "Grade 2":      { "students": [60, 59, 44, 65, 52, 56], "teachers": [3, 3, 2, 3, 2, 2] },
+        "Grade 3":      { "students": [52, 55, 60, 44, 61, 52], "teachers": [3, 3, 3, 3, 3, 3] },
+        "Grade 4":      { "students": [51, 49, 51, 66, 46, 66], "teachers": [3, 3, 3, 3, 3, 3] }
+      }
+    },
+    {
+      "name": "Caley",
+      "grades": {
+        "Kindergarten": { "students": [ 66, 88, 80, 73, 62, 73], "teachers": [4, 4, 4, 4, 4, 4] },
+        "Grade 1":      { "students": [ 98, 70, 86, 85, 74, 62], "teachers": [5, 4, 5, 4, 4, 4] },
+        "Grade 2":      { "students": [62, 101, 73, 82, 76, 66], "teachers": [3, 5, 4, 4, 4, 4] },
+        "Grade 3":      { "students": [76, 63, 119, 76, 84, 76], "teachers": [3, 3, 5, 4, 4, 4] },
+        "Grade 4":      { "students": [79, 82, 72, 112, 77, 85], "teachers": [4, 3, 3, 5, 4, 4] }
+      }
+    },
+    {
+      "name": "Candlebrook",
+      "grades": {
+        "Kindergarten": { "students": [51, 74, 54, 55, 62, 70], "teachers": [3, 4, 3, 3, 3, 3] },
+        "Grade 1":      { "students": [62, 22, 78, 54, 56, 57], "teachers": [3, 3, 4, 3, 3, 3] },
+        "Grade 2":      { "students": [75, 62, 54, 82, 54, 59], "teachers": [4, 3, 3, 4, 3, 3] },
+        "Grade 3":      { "students": [64, 73, 66, 57, 79, 55], "teachers": [3, 4, 3, 3, 4, 3] },
+        "Grade 4":      { "students": [69, 68, 75, 67, 55, 79], "teachers": [3, 3, 4, 3, 3, 4] }
+      }
+    },
+    {
+      "name": "Gulph",
+      "grades": {
+        "Kindergarten": { "students": [96, 87, 74, 93, 85, 85],   "teachers": [4, 4, 4, 4, 4, 4] },
+        "Grade 1":      { "students": [102, 100, 82, 79, 92, 92], "teachers": [5, 5, 4, 4, 4, 4] },
+        "Grade 2":      { "students": [87, 100, 95, 83, 76, 92],  "teachers": [4, 5, 5, 4, 4, 4] },
+        "Grade 3":      { "students": [66, 84, 94, 91, 90, 83],   "teachers": [3, 4, 4, 5, 4, 4] },
+        "Grade 4":      { "students": [79, 73, 87, 93, 80, 90],   "teachers": [3, 3, 4, 4, 4, 4] }
+      }
+    },
+    {
+      "name": "Roberts",
+      "grades": {
+        "Kindergarten": { "students": [54, 68, 52, 51, 62, 58], "teachers": [3, 4, 3, 3, 3, 3] },
+        "Grade 1":      { "students": [53, 57, 70, 49, 51, 63], "teachers": [3, 3, 3, 3, 3, 3] },
+        "Grade 2":      { "students": [48, 54, 57, 71, 46, 48], "teachers": [3, 3, 3, 3, 2, 3] },
+        "Grade 3":      { "students": [59, 49, 57, 60, 69, 42], "teachers": [3, 2, 3, 3, 3, 2] },
+        "Grade 4":      { "students": [47, 64, 53, 54, 60, 62], "teachers": [2, 3, 3, 3, 3, 3] }
+      }
+    }
+  ]
+}

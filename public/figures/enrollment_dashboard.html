@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enrollment &amp; Staffing Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 15px; color: #333; background: #f9fafb; }
+    .container { max-width: 1150px; margin: 0 auto 24px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+    h2 { margin-top: 0; }
+    .chart-container { margin-bottom: 1.5rem; height: 380px; }
+    .chart-row  { display: flex; gap: 16px; margin-bottom: 1.5rem; }
+    .chart-half { flex: 1; height: 320px; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start;
+                  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+                  padding: 10px 14px; margin-bottom: 14px; font-size: 12.5px; }
+    .filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .filter-label { font-weight: 700; color: #475569; margin-right: 2px; white-space: nowrap; }
+    .filter-bar label { display: flex; align-items: center; gap: 4px; cursor: pointer;
+                        padding: 2px 8px; border-radius: 4px; border: 1px solid #e2e8f0;
+                        background: #fff; user-select: none; }
+    .filter-bar label:hover { background: #f1f5f9; }
+    .filter-bar input[type=checkbox]:checked + span,
+    .filter-bar input[type=radio]:checked + span { font-weight: 600; }
+    .filter-sep { width: 1px; height: 28px; background: #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 6px 8px; border: 1px solid #e5e7eb; }
+    th { background: #f3f4f6; font-weight: 600; }
+    .school-header { background: #dbeafe; font-weight: 700; font-size: 13px; }
+    .total-row { font-weight: 700; background: #f9fafb; }
+    .row-hidden { display: none; }
+    .bg-blue   { background: #eff6ff; }
+    .bg-green  { background: #f0fdf4; }
+    .bg-amber  { background: #fffbeb; }
+    .bg-purple { background: #faf5ff; }
+    .bg-rose   { background: #fff1f2; }
+    .bg-sky    { background: #e0f2fe; }
+    .bg-indigo { background: #eef2ff; }
+    .text-muted { color: #6b7280; font-size: 11px; }
+    .section-label { font-size: 13px; font-weight: 700; color: #1e40af;
+                     margin: 1.5rem 0 .4rem; border-bottom: 2px solid #bfdbfe; padding-bottom: 3px; }
+    .note { font-size: 11.5px; color: #4b5563; margin: 6px 0; }
+    .legend-box { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; font-size: 11.5px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-swatch { width: 13px; height: 13px; border-radius: 2px; flex-shrink: 0; }
+    .csr-low  { background: #fef9c3; }
+    .csr-mid  { background: #dcfce7; }
+    .csr-high { background: #dbeafe; }
+    .csr-proj { background: #f3e8ff; font-style: italic; }
+    .redeploy-green  { background: #d1fae5; color: #065f46; font-weight: 600; }
+    .redeploy-yellow { background: #fef3c7; color: #92400e; font-weight: 600; }
+    .redeploy-red    { background: #fee2e2; color: #991b1b; font-weight: 600; }
+    .scenario-table { table-layout: fixed; width: 100%; font-size: 11px; }
+    .scenario-table th, .scenario-table td { padding: 4px 5px; white-space: nowrap;
+                                              overflow: hidden; text-overflow: ellipsis; }
+    .scenario-wrap { overflow-x: auto; margin-bottom: 1rem; }
+    #loadingMsg { text-align:center; padding: 60px; font-size: 16px; color: #6b7280; }
+    #errorMsg   { text-align:center; padding: 60px; font-size: 16px; color: #dc2626; display:none; }
+  </style>
+</head>
+<body>
+
+<div id="loadingMsg">Loading enrollment data…</div>
+<div id="errorMsg"></div>
+
+<div class="container" id="figure-1" style="display:none">
+  <h2>Figure 1 — Enrollment &amp; Staffing Detail by School</h2>
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">Schools</span>
+      <div id="schoolFilterControls"></div>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">View</span>
+      <label><input type="radio" name="gradeMode" value="total" checked><span>School Totals</span></label>
+      <label><input type="radio" name="gradeMode" value="grade"><span>By Grade</span></label>
+    </div>
+    <div class="filter-group" id="gradeFilterGroup" style="display:none">
+      <span class="filter-label">Grades</span>
+      <div id="gradeFilterControls"></div>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Chart Y-Axis</span>
+      <label><input type="radio" name="yAxis" value="enrollment" checked><span>Enrollment</span></label>
+      <label><input type="radio" name="yAxis" value="ratio"><span>Students / Teacher</span></label>
+    </div>
+  </div>
+  <div class="chart-container"><canvas id="enrollmentChart"></canvas></div>
+  <div style="overflow-x:auto;">
+    <table><thead id="fig1Thead"></thead><tbody id="tableBody"></tbody></table>
+  </div>
+</div>
+
+<div class="container" id="figure-2" style="display:none">
+  <h2>Figure 2 — Enrollment Prediction Metrics</h2>
+  <p class="note">
+    <strong>Cohort Survival Rate (CSR)</strong> = students in grade G this year ÷ students in grade G−1 prior year.
+    Projections: Y1 = Actual × Avg CSR; Y2 = Y1 × Avg CSR. Kindergarten uses 6-year historical mean.
+  </p>
+  <div class="legend-box">
+    <div class="legend-item"><div class="legend-swatch csr-low"></div>CSR &lt; 0.95</div>
+    <div class="legend-item"><div class="legend-swatch csr-mid"></div>CSR 0.95–1.05</div>
+    <div class="legend-item"><div class="legend-swatch csr-high"></div>CSR &gt; 1.05</div>
+    <div class="legend-item"><div class="legend-swatch csr-proj"></div>Projected</div>
+  </div>
+  <div class="section-label">2a. Grade-Level CSR &amp; 2-Year Projection</div>
+  <div class="chart-row">
+    <div class="chart-half"><canvas id="csrChart"></canvas></div>
+    <div class="chart-half"><canvas id="projectionChart"></canvas></div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead><tr>
+        <th>School</th><th>Transition</th>
+        <th>CSR 21-22</th><th>CSR 22-23</th><th>CSR 23-24</th><th>CSR 24-25</th><th>CSR 25-26</th>
+        <th class="bg-blue">Avg CSR</th><th class="bg-green">σ</th>
+        <th class="bg-amber">2025-26</th>
+        <th class="bg-purple">Proj Y1</th><th class="bg-rose">Δ Y1</th>
+        <th class="bg-sky">Proj Y2</th><th class="bg-indigo">Δ Y2</th>
+      </tr></thead>
+      <tbody id="csrTableBody"></tbody>
+    </table>
+  </div>
+  <p class="note">* K rows: projection = 6-year mean K enrollment.</p>
+  <div class="section-label">2b. School-Year Average CSR — Redeployment Signal</div>
+  <p class="note">Average CSR across all non-K transitions per school per year. Persistently &lt;1.0 = structural contraction.</p>
+  <div class="chart-row">
+    <div class="chart-half"><canvas id="schoolCsrTrendChart"></canvas></div>
+    <div class="chart-half"><canvas id="redeployChart"></canvas></div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead><tr>
+        <th>School</th>
+        <th>2021-22</th><th>2022-23</th><th>2023-24</th><th>2024-25</th><th>2025-26</th>
+        <th class="bg-blue">5-Yr Avg</th><th class="bg-green">σ</th>
+        <th class="bg-purple">Proj Y1</th><th class="bg-sky">Proj Y2</th>
+        <th class="bg-amber">Trend</th><th>Redeployment</th>
+      </tr></thead>
+      <tbody id="schoolCsrBody"></tbody>
+    </table>
+  </div>
+  <p class="note">
+    <span class="redeploy-green" style="padding:1px 5px;border-radius:3px;">Hold</span> ≥1.0 &nbsp;
+    <span class="redeploy-yellow" style="padding:1px 5px;border-radius:3px;">Monitor</span> 0.95–0.99 &nbsp;
+    <span class="redeploy-red" style="padding:1px 5px;border-radius:3px;">Redeploy</span> &lt;0.95
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FIGURE 3 — IDs updated to match the JS exactly
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="container" id="figure-3" style="display:none">
+  <h2>Figure 3 — Teacher Allocation Scenarios: Worst-Grade Student/Teacher Ratio</h2>
+  <p class="note">
+    <strong>Actual Staffing</strong> = recorded allocation each year. &nbsp;
+    <strong>Optimal — Actual Teachers</strong> = same headcount redistributed to minimise the worst grade ratio (greedy min-max). &nbsp;
+    <strong>Uniform — Max Teachers</strong> = maximum historical total distributed equally across grades. &nbsp;
+    <strong>Optimal — Max Teachers</strong> = maximum historical total redistributed optimally.
+    Dashed lines = CSR-based projections (2026-27, 2027-28).
+  </p>
+  <div class="legend-box">
+    <div class="legend-item"><div class="legend-swatch" style="background:#ef4444;"></div>Actual Staffing</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#f59e0b;"></div>Optimal — Actual Teachers</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#3b82f6;"></div>Uniform — Max Teachers</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#10b981;"></div>Optimal — Max Teachers</div>
+  </div>
+
+  <!-- Main line chart: worst-grade ratio across all scenarios -->
+  <div class="section-label">3a. Worst-Grade Max Ratio by Scenario (All Schools)</div>
+  <div class="chart-container" style="height:420px;">
+    <canvas id="allocationChart"></canvas>
+  </div>
+
+  <!-- Ratio-gain bar chart -->
+  <div class="section-label">3b. Ratio Points Saved vs Actual (Optimal Max-Staff − Actual)</div>
+  <p class="note">Positive = improvement over actual staffing. Negative = actual staffing happened to outperform the optimal max-staff allocation (rare).</p>
+  <div class="chart-container" style="height:320px;">
+    <canvas id="ratioGainChart"></canvas>
+  </div>
+
+  <!-- Per-school scenario tables injected by JS -->
+  <div class="section-label">3c. Per-School Allocation Detail</div>
+  <div id="allocationTablesContainer"></div>
+</div>
+
+<script>
+// ─── Pure calculation helpers ────────────────────────────────────────────────
+function stats(arr) {
+  const n = arr.length; if (!n) return { mean:0, stdDev:0, rsd:0 };
+  const mean = arr.reduce((a,b)=>a+b,0)/n;
+  const stdDev = Math.sqrt(arr.reduce((a,b)=>a+(b-mean)**2,0)/n);
+  return { mean, stdDev, rsd: mean>0?(stdDev/mean)*100:0 };
+}
+const f1=v=>v.toFixed(1), f2=v=>v.toFixed(2), f3=v=>v.toFixed(3);
+function csrClass(v){ return v==null?'':v<0.95?'csr-low':v<=1.05?'csr-mid':'csr-high'; }
+function deltaCell(d){ return (d>0?'+':'')+d; }
+function trendArrow(vals){
+  const n=vals.length; if(n<2) return '→';
+  const xm=(n-1)/2; let num=0,den=0;
+  vals.forEach((v,i)=>{num+=(i-xm)*v; den+=(i-xm)**2;});
+  const s=num/den;
+  return s>0.005?'↑ Improving':s<-0.005?'↓ Declining':'→ Stable';
+}
+function getCSRRows(school){
+  const gNames=Object.keys(school.grades);
+  return gNames.map((gName,g)=>{
+    const curr=school.grades[gName].students;
+    const currT=school.grades[gName].teachers;
+    if(g===0){
+      const s=stats(curr);
+      return{grade:gName,transition:'New Entry → K',isKinder:true,
+        csrs:[null,null,null,null,null],avgCSR:null,stdCSR:null,
+        actual:curr[5],teachers:currT[5],
+        proj1:Math.round(s.mean),proj2:Math.round(s.mean)};
+    }
+    const prev=school.grades[gNames[g-1]].students;
+    const csrs=[1,2,3,4,5].map(yi=>curr[yi]/prev[yi-1]);
+    const{mean:mu,stdDev:sig}=stats(csrs);
+    const actual=curr[5];
+    return{grade:gName,transition:`${gNames[g-1]} → ${gName}`,isKinder:false,
+      csrs,avgCSR:mu,stdCSR:sig,actual,teachers:currT[5],
+      proj1:Math.round(actual*mu),proj2:Math.round(actual*mu*mu)};
+  });
+}
+
+// ─── Allocation helpers ───────────────────────────────────────────────────────
+function optimalAlloc(enrollments, totalTeachers){
+  const n=enrollments.length;
+  const t=Array(n).fill(1);
+  let rem=totalTeachers-n;
+  if(rem<0) return t;
+  while(rem>0){
+    let worst=-1,worstRatio=-1;
+    for(let i=0;i<n;i++){const r=enrollments[i]/t[i];if(r>worstRatio){worstRatio=r;worst=i;}}
+    t[worst]++;rem--;
+  }
+  return t;
+}
+function maxRatio(enrollments, alloc){
+  return Math.max(...enrollments.map((e,i)=>e/alloc[i]));
+}
+function worstGrade(gNames, enrollments, alloc){
+  let wi=0,wr=0;
+  enrollments.forEach((e,i)=>{const r=e/alloc[i];if(r>wr){wr=r;wi=i;}});
+  return gNames[wi];
+}
+function projEnrollments(school, depth){
+  const gNames=Object.keys(school.grades);
+  const csrRows=getCSRRows(school);
+  const lastIdx=6; // years.length - 1; resolved after data loads
+  if(depth===1){
+    return gNames.map((gName,g)=>{
+      if(g===0) return Math.round(stats(school.grades[gName].students).mean);
+      const prev=school.grades[gNames[g-1]].students[lastIdx];
+      return Math.round(prev*csrRows[g].avgCSR);
+    });
+  }
+  const d1=projEnrollments(school,1);
+  return gNames.map((gName,g)=>{
+    if(g===0) return Math.round(stats(school.grades[gName].students).mean);
+    return Math.round(d1[g-1]*csrRows[g].avgCSR);
+  });
+}
+
+// ─── Main entry point ─────────────────────────────────────────────────────────
+const params = new URLSearchParams(location.search);
+const figureParam = params.get('figure');
+const targetFigure = figureParam ? `figure-${figureParam}` : '';
+
+async function init(){
+  let rawData;
+  try {
+    const res = await fetch('./enrollment.json');
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    rawData = await res.json();
+  } catch(err){
+    document.getElementById('loadingMsg').style.display='none';
+    const el=document.getElementById('errorMsg');
+    el.style.display='block';
+    el.textContent=`Failed to load enrollment.json: ${err.message}`;
+    return;
+  }
+
+  const years      = rawData.years;
+  const csrYears   = years.slice(1);
+  const schoolData = rawData.schools;
+  const allGrades  = [...new Set(schoolData.flatMap(s=>Object.keys(s.grades)))];
+
+  const colors = [
+    '#3b82f6','#f59e0b','#10b981','#8b5cf6','#ef4444',
+    '#06b6d4','#84cc16','#f97316','#ec4899','#14b8a6'
+  ].slice(0,schoolData.length);
+
+  const gradeColors = [
+    '#6366f1','#0ea5e9','#22c55e','#f59e0b','#ef4444',
+    '#a855f7','#14b8a6','#f97316','#84cc16','#ec4899'
+  ].slice(0,allGrades.length);
+
+  document.getElementById('loadingMsg').style.display='none';
+  ['figure-1','figure-2','figure-3'].forEach(id=>{
+    const show = !targetFigure || id === targetFigure;
+    document.getElementById(id).style.display = show ? '' : 'none';
+  });
+
+  // ── Figure 1 ──────────────────────────────────────────────────────────────
+  const schoolCtrl=document.getElementById('schoolFilterControls');
+  schoolData.forEach((s,i)=>{
+    const lbl=document.createElement('label');
+    lbl.innerHTML=`<input type="checkbox" class="school-filter" value="${s.name}" checked><span>${s.name}</span>`;
+    lbl.querySelector('input').style.accentColor=colors[i];
+    schoolCtrl.appendChild(lbl);
+  });
+  const gradeCtrl=document.getElementById('gradeFilterControls');
+  allGrades.forEach((g,i)=>{
+    const lbl=document.createElement('label');
+    lbl.innerHTML=`<input type="checkbox" class="grade-filter" value="${g}" checked><span>${g.replace('Kindergarten','K')}</span>`;
+    lbl.querySelector('input').style.accentColor=gradeColors[i];
+    gradeCtrl.appendChild(lbl);
+  });
+
+  const fig1Thead=document.getElementById('fig1Thead');
+  fig1Thead.innerHTML=`<tr>
+    <th>School / Grade</th><th>Metric</th>
+    ${years.map(y=>`<th>${y}</th>`).join('')}
+    <th class="bg-blue">Mean</th><th class="bg-green">σ</th><th class="bg-amber">%RSD</th>
+  </tr>`;
+
+  const tbody=document.getElementById('tableBody');
+  schoolData.forEach((school)=>{
+    let totS=Array(years.length).fill(0),totT=Array(years.length).fill(0);
+    const hdr=document.createElement('tr');
+    hdr.className='school-header';
+    hdr.dataset.school=school.name; hdr.dataset.type='header';
+    hdr.innerHTML=`<td colspan="${years.length+4}">${school.name}</td>`;
+    tbody.appendChild(hdr);
+    Object.keys(school.grades).forEach(gName=>{
+      const g=school.grades[gName];
+      for(let i=0;i<years.length;i++){totS[i]+=g.students[i];totT[i]+=g.teachers[i];}
+      const ss=stats(g.students),ts=stats(g.teachers);
+      const sr=document.createElement('tr');
+      sr.dataset.school=school.name; sr.dataset.grade=gName; sr.dataset.type='students';
+      sr.innerHTML=`<td>${gName}</td><td>Students</td>`
+        +g.students.map(v=>`<td>${v}</td>`).join('')
+        +`<td class="bg-blue">${f1(ss.mean)}</td><td class="bg-green">${f1(ss.stdDev)}</td><td class="bg-amber">${f1(ss.rsd)}%</td>`;
+      tbody.appendChild(sr);
+      const tr=document.createElement('tr');
+      tr.className='text-muted'; tr.dataset.school=school.name; tr.dataset.grade=gName; tr.dataset.type='teachers';
+      tr.innerHTML=`<td></td><td>Teachers</td>`
+        +g.teachers.map(v=>`<td>${v}</td>`).join('')
+        +`<td class="bg-blue">${f1(ts.mean)}</td><td class="bg-green">${f1(ts.stdDev)}</td><td class="bg-amber">${f1(ts.rsd)}%</td>`;
+      tbody.appendChild(tr);
+    });
+    const tss=stats(totS),tts=stats(totT);
+    const tsRow=document.createElement('tr');
+    tsRow.className='total-row'; tsRow.dataset.school=school.name; tsRow.dataset.type='total-students';
+    tsRow.innerHTML=`<td>Total</td><td>Students</td>`+totS.map(v=>`<td>${v}</td>`).join('')
+      +`<td class="bg-blue">${f1(tss.mean)}</td><td class="bg-green">${f1(tss.stdDev)}</td><td class="bg-amber">${f1(tss.rsd)}%</td>`;
+    tbody.appendChild(tsRow);
+    const ttRow=document.createElement('tr');
+    ttRow.className='total-row text-muted'; ttRow.dataset.school=school.name; ttRow.dataset.type='total-teachers';
+    ttRow.innerHTML=`<td></td><td>Teachers</td>`+totT.map(v=>`<td>${v}</td>`).join('')
+      +`<td class="bg-blue">${f1(tts.mean)}</td><td class="bg-green">${f1(tts.stdDev)}</td><td class="bg-amber">${f1(tts.rsd)}%</td>`;
+    tbody.appendChild(ttRow);
+  });
+
+  let fig1Chart=null;
+  function getFilterState(){
+    return{
+      selSchools:[...document.querySelectorAll('.school-filter:checked')].map(el=>el.value),
+      gradeMode:document.querySelector('input[name="gradeMode"]:checked').value,
+      selGrades:[...document.querySelectorAll('.grade-filter:checked')].map(el=>el.value),
+      yAxis:document.querySelector('input[name="yAxis"]:checked').value
+    };
+  }
+  function buildChartDatasets({selSchools,gradeMode,selGrades,yAxis}){
+    const datasets=[];
+    schoolData.forEach((school,si)=>{
+      if(!selSchools.includes(school.name))return;
+      const gNames=Object.keys(school.grades);
+      if(gradeMode==='total'){
+        const data=years.map((_,yi)=>{
+          const s=gNames.reduce((sum,g)=>sum+school.grades[g].students[yi],0);
+          const t=gNames.reduce((sum,g)=>sum+school.grades[g].teachers[yi],0);
+          return yAxis==='ratio'?parseFloat((s/t).toFixed(2)):s;
+        });
+        datasets.push({label:`${school.name} (Total)`,data,
+          borderColor:colors[si],backgroundColor:colors[si]+'22',
+          tension:0.25,pointRadius:5,fill:false});
+      } else {
+        gNames.filter(g=>selGrades.includes(g)).forEach((gName,gi)=>{
+          const g=school.grades[gName];
+          const data=years.map((_,yi)=>yAxis==='ratio'
+            ?parseFloat((g.students[yi]/g.teachers[yi]).toFixed(2)):g.students[yi]);
+          const hue=[260,210,160,40,330,180][gi%6];
+          const sat=si===0?65:si===1?55:45;
+          datasets.push({label:`${school.name} – ${gName}`,data,
+            borderColor:`hsl(${hue},${sat}%,48%)`,
+            backgroundColor:`hsl(${hue},${sat}%,48%)22`,
+            tension:0.25,pointRadius:4,fill:false,
+            borderDash:si===1?[5,3]:si===2?[2,2]:[]});
+        });
+      }
+    });
+    return datasets;
+  }
+  function updateFig1(){
+    const state=getFilterState();
+    const ctx=document.getElementById('enrollmentChart').getContext('2d');
+    if(fig1Chart)fig1Chart.destroy();
+    fig1Chart=new Chart(ctx,{type:'line',
+      data:{labels:years,datasets:buildChartDatasets(state)},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false}},
+        scales:{y:{title:{display:true,
+          text:state.yAxis==='ratio'?'Students per Teacher':'Total Enrolled Students'}}}}});
+    const{selSchools,gradeMode,selGrades}=state;
+    tbody.querySelectorAll('tr').forEach(row=>{
+      const sch=row.dataset.school,typ=row.dataset.type,grd=row.dataset.grade;
+      let show=false;
+      if(!sch){show=true;}
+      else if(!selSchools.includes(sch)){show=false;}
+      else if(typ==='header'){show=true;}
+      else if(gradeMode==='total'){show=(typ==='total-students'||typ==='total-teachers');}
+      else{show=(typ==='students'||typ==='teachers')&&selGrades.includes(grd);}
+      row.classList.toggle('row-hidden',!show);
+    });
+  }
+  document.querySelectorAll('input[name="gradeMode"]').forEach(el=>
+    el.addEventListener('change',()=>{
+      document.getElementById('gradeFilterGroup').style.display=el.value==='grade'?'':'none';
+      updateFig1();
+    }));
+  document.querySelectorAll('.school-filter,.grade-filter').forEach(el=>el.addEventListener('change',updateFig1));
+  document.querySelectorAll('input[name="yAxis"]').forEach(el=>el.addEventListener('change',updateFig1));
+  updateFig1();
+
+  // ── Figure 2 ──────────────────────────────────────────────────────────────
+  const csrTbody=document.getElementById('csrTableBody');
+  const allTransitions=[],csrBarData={},projLabels=[],actualArr=[],proj1Arr=[],proj2Arr=[];
+  schoolData.forEach((school)=>{
+    const rows=getCSRRows(school);
+    csrBarData[school.name]={};
+    const hdr=document.createElement('tr');
+    hdr.className='school-header';
+    hdr.innerHTML=`<td colspan="14">${school.name}</td>`;
+    csrTbody.appendChild(hdr);
+    rows.forEach(r=>{
+      const tr=document.createElement('tr');
+      const cc=r.csrs.map(v=>v==null
+        ?`<td class="text-muted" style="text-align:center">—</td>`
+        :`<td class="${csrClass(v)}">${f2(v)}</td>`).join('');
+      const ac=r.isKinder
+        ?`<td class="bg-blue text-muted" style="text-align:center">—</td>`
+        :`<td class="bg-blue"><b>${f2(r.avgCSR)}</b></td>`;
+      const sc=r.isKinder
+        ?`<td class="bg-green text-muted" style="text-align:center">—</td>`
+        :`<td class="bg-green">${f2(r.stdCSR)}</td>`;
+      tr.innerHTML=`<td>${school.name}</td><td>${r.transition}</td>`+cc+ac+sc
+        +`<td class="bg-amber">${r.actual}</td>`
+        +`<td class="bg-purple csr-proj"><b>${r.proj1}</b></td><td class="bg-rose">${deltaCell(r.proj1-r.actual)}</td>`
+        +`<td class="bg-sky csr-proj"><b>${r.proj2}</b></td><td class="bg-indigo">${deltaCell(r.proj2-r.actual)}</td>`;
+      csrTbody.appendChild(tr);
+      const lbl=`${school.name.substring(0,3)}. ${r.transition.split('→')[1]?.trim()||'K'}`;
+      if(!allTransitions.includes(r.transition))allTransitions.push(r.transition);
+      if(!r.isKinder)csrBarData[school.name][r.transition]=r.avgCSR;
+      projLabels.push(lbl); actualArr.push(r.actual); proj1Arr.push(r.proj1); proj2Arr.push(r.proj2);
+    });
+  });
+
+  new Chart(document.getElementById('csrChart').getContext('2d'),{type:'bar',
+    data:{labels:allTransitions.filter(t=>!t.startsWith('New')),
+      datasets:schoolData.map((s,si)=>({label:`${s.name} Avg CSR`,
+        data:allTransitions.filter(t=>!t.startsWith('New')).map(t=>csrBarData[s.name][t]??null),
+        backgroundColor:colors[si]+'bb',borderColor:colors[si],borderWidth:1}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{title:{display:true,text:'Average CSR by Grade Transition'},legend:{position:'top'},
+        tooltip:{mode:'index',intersect:false}},
+      scales:{y:{min:0.80,max:1.25,title:{display:true,text:'Avg CSR'},ticks:{callback:v=>v.toFixed(2)}},
+        x:{ticks:{font:{size:10}}}}}});
+
+  new Chart(document.getElementById('projectionChart').getContext('2d'),{type:'bar',
+    data:{labels:projLabels,datasets:[
+      {label:'2025-26 Actual',data:actualArr,backgroundColor:'#94a3b8cc',borderColor:'#64748b',borderWidth:1},
+      {label:'Proj Y1',data:proj1Arr,backgroundColor:'#818cf8cc',borderColor:'#4338ca',borderWidth:1},
+      {label:'Proj Y2',data:proj2Arr,backgroundColor:'#38bdf8cc',borderColor:'#0369a1',borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{title:{display:true,text:'2-Year Projection vs Actual'},legend:{position:'top'},
+        tooltip:{mode:'index',intersect:false}},
+      scales:{y:{title:{display:true,text:'Students'}},x:{ticks:{font:{size:9},maxRotation:60}}}}});
+
+  const schoolCsrBody=document.getElementById('schoolCsrBody');
+  const schoolYearCsrData=[];
+  schoolData.forEach((school,si)=>{
+    const rows=getCSRRows(school).filter(r=>!r.isKinder);
+    const annualAvg=csrYears.map((_,yi)=>stats(rows.map(r=>r.csrs[yi])).mean);
+    const s=stats(annualAvg),trend=trendArrow(annualAvg);
+    let rdClass='redeploy-green',rdText='Hold';
+    if(s.mean<0.95){rdClass='redeploy-red';rdText='Redeploy';}
+    else if(s.mean<1.0){rdClass='redeploy-yellow';rdText='Monitor';}
+    schoolYearCsrData.push({name:school.name,annualAvg,mean:s.mean,color:colors[si]});
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><b>${school.name}</b></td>`
+      +annualAvg.map(v=>`<td class="${csrClass(v)}">${f3(v)}</td>`).join('')
+      +`<td class="bg-blue"><b>${f3(s.mean)}</b></td><td class="bg-green">${f3(s.stdDev)}</td>`
+      +`<td class="bg-purple csr-proj">${f3(s.mean)}</td><td class="bg-sky csr-proj">${f3(s.mean)}</td>`
+      +`<td>${trend}</td><td class="${rdClass}">${rdText}</td>`;
+    schoolCsrBody.appendChild(tr);
+  });
+
+  new Chart(document.getElementById('schoolCsrTrendChart').getContext('2d'),{type:'line',
+    data:{labels:[...csrYears,'Proj Y1','Proj Y2'],
+      datasets:schoolYearCsrData.map(s=>({label:`${s.name} Avg CSR`,
+        data:[...s.annualAvg,s.mean,s.mean],borderColor:s.color,backgroundColor:s.color+'22',
+        segment:{borderDash:ctx=>ctx.p0DataIndex>=s.annualAvg.length-1?[6,3]:[]},
+        tension:0.2,pointRadius:5,fill:false}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{title:{display:true,text:'School-Year Avg CSR + 2-Yr Projection'},legend:{position:'top'},
+        tooltip:{mode:'index',intersect:false}},
+      scales:{y:{min:0.85,max:1.15,title:{display:true,text:'Avg CSR'},ticks:{callback:v=>v.toFixed(3)}}}}});
+
+  new Chart(document.getElementById('redeployChart').getContext('2d'),{type:'bar',
+    data:{labels:schoolYearCsrData.map(s=>s.name),
+      datasets:[{label:'5-Yr Avg CSR',data:schoolYearCsrData.map(s=>s.mean),
+        backgroundColor:schoolYearCsrData.map(s=>s.mean<0.95?'#fca5a5':s.mean<1.0?'#fcd34d':'#6ee7b7'),
+        borderColor:schoolYearCsrData.map(s=>s.mean<0.95?'#dc2626':s.mean<1.0?'#d97706':'#059669'),
+        borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{title:{display:true,text:'5-Year Avg CSR by School'},legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.raw.toFixed(3)}`}}},
+      scales:{y:{min:0.90,max:1.10,title:{display:true,text:'Avg CSR'},ticks:{callback:v=>v.toFixed(3)}}}},
+    plugins:[{id:'bl',afterDraw(chart){
+      const{ctx,chartArea:{left,right},scales:{y}}=chart;
+      const yp=y.getPixelForValue(1.0);
+      ctx.save();ctx.beginPath();ctx.moveTo(left,yp);ctx.lineTo(right,yp);
+      ctx.strokeStyle='#374151';ctx.lineWidth=2;ctx.setLineDash([6,3]);ctx.stroke();
+      ctx.setLineDash([]);ctx.fillStyle='#374151';ctx.font='11px system-ui';
+      ctx.fillText('CSR=1.0',right-58,yp-5);ctx.restore();
+    }}]});
+
+  // ── Figure 3 ──────────────────────────────────────────────────────────────
+  const allocContainer = document.getElementById('allocationTablesContainer');
+  const abbr = s => s.replace('Kindergarten','K').replace('Grade ','G');
+
+  const allLabels   = [];
+  const dsActual    = [], dsOptActual = [], dsUniformMax = [], dsOptMax = [];
+  const isProjArr   = [];   // parallel: true for projected rows
+  const nHistYears  = years.length;
+  const projYrLabels = ['Proj 2026-27','Proj 2027-28'];
+
+  schoolData.forEach((school, si) => {
+    const gNames  = Object.keys(school.grades);
+    const color   = colors[si];
+    const lastIdx = years.length - 1;
+
+    const maxTeachers = Math.max(...years.map((_,yi) =>
+      gNames.reduce((s,g) => s + school.grades[g].teachers[yi], 0)
+    ));
+    const nG = gNames.length;
+
+    // ── Historical years ────────────────────────────────────────────────
+    const histData = years.map((_,yi) => {
+      const enr    = gNames.map(g => school.grades[g].students[yi]);
+      const actT   = gNames.map(g => school.grades[g].teachers[yi]);
+      const totalT = actT.reduce((a,b)=>a+b,0);
+      const optT   = optimalAlloc(enr, totalT);
+      const uniMax = Array(nG).fill(Math.floor(maxTeachers/nG));
+      let leftover = maxTeachers - uniMax.reduce((a,b)=>a+b,0);
+      for(let i=0;i<leftover;i++) uniMax[i]++;
+      const optMaxT = optimalAlloc(enr, maxTeachers);
+      return {
+        year: years[yi], isProj: false,
+        enr, actT, optT, uniMax, optMaxT, totalT, maxTeachers,
+        rActual:     parseFloat(maxRatio(enr,actT).toFixed(2)),
+        rOptActual:  parseFloat(maxRatio(enr,optT).toFixed(2)),
+        rUniformMax: parseFloat(maxRatio(enr,uniMax).toFixed(2)),
+        rOptMax:     parseFloat(maxRatio(enr,optMaxT).toFixed(2)),
+        worstActual:     worstGrade(gNames,enr,actT),
+        worstOptActual:  worstGrade(gNames,enr,optT),
+        worstUniMax:     worstGrade(gNames,enr,uniMax),
+        worstOptMax:     worstGrade(gNames,enr,optMaxT),
+      };
+    });
+
+    // ── Projected years ─────────────────────────────────────────────────
+    // Override projEnrollments' hardcoded lastIdx with the real one
+    function projEnr(depth){
+      const csrRows = getCSRRows(school);
+      if(depth===1){
+        return gNames.map((gName,g)=>{
+          if(g===0) return Math.round(stats(school.grades[gName].students).mean);
+          const prev=school.grades[gNames[g-1]].students[lastIdx];
+          return Math.round(prev*csrRows[g].avgCSR);
+        });
+      }
+      const d1=projEnr(1);
+      return gNames.map((gName,g)=>{
+        if(g===0) return Math.round(stats(school.grades[gName].students).mean);
+        return Math.round(d1[g-1]*csrRows[g].avgCSR);
+      });
+    }
+
+    const projData = [1,2].map(depth => {
+      const enr    = projEnr(depth);
+      const uniMax = Array(nG).fill(Math.floor(maxTeachers/nG));
+      let leftover = maxTeachers - uniMax.reduce((a,b)=>a+b,0);
+      for(let i=0;i<leftover;i++) uniMax[i]++;
+      const optMaxT = optimalAlloc(enr, maxTeachers);
+      const lastActT = gNames.map(g => school.grades[g].teachers[lastIdx]);
+      const lastTotal = lastActT.reduce((a,b)=>a+b,0);
+      const optT = optimalAlloc(enr, lastTotal);
+      return {
+        year: projYrLabels[depth-1], isProj: true,
+        enr, actT: lastActT, optT, uniMax, optMaxT,
+        totalT: lastTotal, maxTeachers,
+        rActual:     parseFloat(maxRatio(enr,lastActT).toFixed(2)),
+        rOptActual:  parseFloat(maxRatio(enr,optT).toFixed(2)),
+        rUniformMax: parseFloat(maxRatio(enr,uniMax).toFixed(2)),
+        rOptMax:     parseFloat(maxRatio(enr,optMaxT).toFixed(2)),
+        worstActual:     worstGrade(gNames,enr,lastActT),
+        worstOptActual:  worstGrade(gNames,enr,optT),
+        worstUniMax:     worstGrade(gNames,enr,uniMax),
+        worstOptMax:     worstGrade(gNames,enr,optMaxT),
+      };
+    });
+
+    const allRows     = [...histData, ...projData];
+    const allYrLabels = allRows.map(r=>`${school.name.substring(0,3)} ${r.year}`);
+
+    allYrLabels.forEach((l,i)=>{
+      allLabels.push(l);
+      dsActual.push(allRows[i].rActual);
+      dsOptActual.push(allRows[i].rOptActual);
+      dsUniformMax.push(allRows[i].rUniformMax);
+      dsOptMax.push(allRows[i].rOptMax);
+      isProjArr.push(allRows[i].isProj);
+    });
+
+    // ── Per-school table ─────────────────────────────────────────────────
+    const sec = document.createElement('div');
+    sec.innerHTML = `<div class="section-label">${school.name}
+      <span style="font-weight:400;font-size:11px;color:#6b7280;margin-left:8px;">
+        Max teachers: ${maxTeachers} &nbsp;|&nbsp; Grades: ${nG}
+      </span></div>`;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'scenario-wrap';
+
+    const tbl = document.createElement('table');
+    tbl.className = 'scenario-table';
+
+    const scenHdr = (label,cls) =>
+      `<th colspan="${nG+2}" class="${cls}" style="text-align:center;border-bottom:2px solid #94a3b8;">${label}</th>`;
+
+    tbl.innerHTML = `<thead>
+      <tr>
+        <th rowspan="2" style="min-width:36px;white-space:nowrap;">Year</th>
+        ${scenHdr('Actual Staffing','bg-rose')}
+        ${scenHdr('Optimal — Actual Teachers','bg-amber')}
+        ${scenHdr('Uniform — Max Teachers ('+maxTeachers+')','bg-blue')}
+        ${scenHdr('Optimal — Max Teachers','bg-green')}
+      </tr>
+      <tr>
+        ${['bg-rose','bg-amber','bg-blue','bg-green'].map(cls=>
+          gNames.map(g=>`<th class="${cls}" style="text-align:center;font-size:9px;">${abbr(g)}</th>`).join('')
+          +`<th class="${cls}" style="text-align:center;font-size:9px;">Max:1</th>`
+          +`<th class="${cls}" style="text-align:center;font-size:9px;">Worst</th>`
+        ).join('')}
+      </tr>
+    </thead><tbody></tbody>`;
+
+    const tbody3 = tbl.querySelector('tbody');
+
+    allRows.forEach((r, ri) => {
+      if(ri === nHistYears){
+        const div=document.createElement('tr');
+        div.innerHTML=`<td colspan="${1+4*(nG+2)}" style="background:#f1f5f9;font-size:10px;
+          font-style:italic;color:#64748b;padding:3px 6px;border-top:2px dashed #94a3b8;">
+          ▼ Projected enrollment (CSR mean) — actual allocation assumes last year's staffing repeats
+        </td>`;
+        tbody3.appendChild(div);
+      }
+
+      const tr = document.createElement('tr');
+      if(r.isProj) tr.style.background = '#f5f3ff';
+
+      const ratioCell = (ratio, worst) => {
+        const col = ratio > 24 ? '#dc2626' : ratio > 20 ? '#d97706' : '#16a34a';
+        const bg  = ratio > 24 ? '#fee2e2' : ratio > 20 ? '#fef3c7' : '#f0fdf4';
+        return `<td style="text-align:center;font-weight:700;background:${bg};color:${col};">${ratio.toFixed(1)}</td>`
+             + `<td style="text-align:center;font-size:10px;color:#64748b;">${abbr(worst)}</td>`;
+      };
+
+      const allocCells = (alloc, cls) =>
+        alloc.map(t=>`<td class="${cls}" style="text-align:center;">${t}</td>`).join('');
+
+      const shortYr = s => s.replace(/\d{2}(\d{2})-\d{2}/,'\'$1');
+      const year = r.isProj
+        ? `<em style="color:#7c3aed;">P${shortYr(r.year.replace('Proj ',''))}</em>`
+        : `<b>${shortYr(r.year)}</b>`;
+
+      tr.innerHTML = `<td style="white-space:nowrap;min-width:36px;">${year}</td>`
+        + allocCells(r.actT,   'bg-rose')   + ratioCell(r.rActual,    r.worstActual)
+        + allocCells(r.optT,   'bg-amber')  + ratioCell(r.rOptActual, r.worstOptActual)
+        + allocCells(r.uniMax, 'bg-blue')   + ratioCell(r.rUniformMax,r.worstUniMax)
+        + allocCells(r.optMaxT,'bg-green')  + ratioCell(r.rOptMax,    r.worstOptMax);
+
+      tbody3.appendChild(tr);
+    });
+
+    wrap.appendChild(tbl);
+    sec.appendChild(wrap);
+    allocContainer.appendChild(sec);
+  });
+
+  // ── 3a: Grouped bar chart (projected bars are lighter + hatched border) ──
+  // Per-bar colours: solid for historical, semi-transparent for projected
+  function makeBarColors(data, solidHex, projHex){
+    return data.map((_,i) => isProjArr[i] ? projHex : solidHex);
+  }
+  function makeBorderColors(data, solidHex, projHex){
+    return data.map((_,i) => isProjArr[i] ? projHex : solidHex);
+  }
+  function makeBorderWidths(data){
+    return data.map((_,i) => isProjArr[i] ? 2 : 1);
+  }
+  function makeBorderDash(data){
+    // Chart.js grouped bar: borderDash per-bar via scriptable option
+    return (ctx) => isProjArr[ctx.dataIndex] ? [4,3] : [];
+  }
+
+  new Chart(document.getElementById('allocationChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: allLabels,
+      datasets: [
+        { label:'Actual Staffing',
+          data: dsActual,
+          backgroundColor: makeBarColors(dsActual,    '#ef4444cc', '#ef444455'),
+          borderColor:      makeBorderColors(dsActual, '#ef4444',   '#ef4444aa'),
+          borderWidth:      makeBorderWidths(dsActual),
+          borderDash:       makeBorderDash(dsActual) },
+        { label:'Optimal — Actual Teachers',
+          data: dsOptActual,
+          backgroundColor: makeBarColors(dsOptActual,    '#f59e0bcc', '#f59e0b55'),
+          borderColor:      makeBorderColors(dsOptActual, '#f59e0b',   '#f59e0baa'),
+          borderWidth:      makeBorderWidths(dsOptActual),
+          borderDash:       makeBorderDash(dsOptActual) },
+        { label:'Uniform — Max Teachers',
+          data: dsUniformMax,
+          backgroundColor: makeBarColors(dsUniformMax,    '#3b82f6cc', '#3b82f655'),
+          borderColor:      makeBorderColors(dsUniformMax, '#3b82f6',   '#3b82f6aa'),
+          borderWidth:      makeBorderWidths(dsUniformMax),
+          borderDash:       makeBorderDash(dsUniformMax) },
+        { label:'Optimal — Max Teachers',
+          data: dsOptMax,
+          backgroundColor: makeBarColors(dsOptMax,    '#10b981cc', '#10b98155'),
+          borderColor:      makeBorderColors(dsOptMax, '#10b981',   '#10b981aa'),
+          borderWidth:      makeBorderWidths(dsOptMax),
+          borderDash:       makeBorderDash(dsOptMax) },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        title:{display:true,text:'Worst-Grade Student/Teacher Ratio by Staffing Scenario'},
+        legend:{position:'top'},
+        tooltip:{
+          mode:'index', intersect:false,
+          callbacks:{
+            title: items => {
+              const i = items[0]?.dataIndex;
+              return allLabels[i] + (isProjArr[i] ? '  (projected)' : '');
+            },
+            label: ctx => `${ctx.dataset.label}: ${ctx.raw}:1`
+          }
+        }
+      },
+      scales:{
+        y:{title:{display:true,text:'Max Students per Teacher'},ticks:{callback:v=>v+':1'}},
+        x:{ticks:{font:{size:9},maxRotation:55}}
+      }
+    },
+    plugins:[{
+      id:'ref24',afterDraw(chart){
+        const{ctx,chartArea:{left,right},scales:{y}}=chart;
+        const yp=y.getPixelForValue(24);
+        ctx.save();ctx.beginPath();ctx.moveTo(left,yp);ctx.lineTo(right,yp);
+        ctx.strokeStyle='#dc2626';ctx.lineWidth=1.5;ctx.setLineDash([6,3]);ctx.stroke();
+        ctx.setLineDash([]);ctx.fillStyle='#dc2626';ctx.font='10px system-ui';
+        ctx.fillText('24:1 threshold',right-80,yp-4);ctx.restore();
+      }
+    }]
+  });
+
+  // ── 3b: Ratio-gain bar chart ─────────────────────────────────────────────
+  const gainLabels=[], gainData=[], gainColors=[];
+  schoolData.forEach((school,si)=>{
+    const gNames=Object.keys(school.grades);
+    const lastIdx=years.length-1;
+    const maxT=Math.max(...years.map((_,yi)=>gNames.reduce((s,g)=>s+school.grades[g].teachers[yi],0)));
+    years.forEach((yr,yi)=>{
+      const enr=gNames.map(g=>school.grades[g].students[yi]);
+      const actT=gNames.map(g=>school.grades[g].teachers[yi]);
+      const optMaxT=optimalAlloc(enr,maxT);
+      const gain=maxRatio(enr,actT)-maxRatio(enr,optMaxT);
+      gainLabels.push(`${school.name.substring(0,3)} ${yr}`);
+      gainData.push(parseFloat(gain.toFixed(2)));
+      gainColors.push(gain>0?'#86efaccc':'#fca5a5cc');
+    });
+  });
+
+  new Chart(document.getElementById('ratioGainChart').getContext('2d'),{
+    type:'bar',
+    data:{labels:gainLabels,datasets:[{
+      label:'Ratio improvement (Actual → Optimal Max Staff)',
+      data:gainData,
+      backgroundColor:gainColors,
+      borderColor:gainColors.map(c=>c.replace('cc','ff')),
+      borderWidth:1
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{title:{display:true,text:'Ratio Points Saved vs Actual (Optimal Max-Staff − Actual)'},
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>`${ctx.raw>0?'−':'+'} ${Math.abs(ctx.raw)} ratio points`}}},
+      scales:{
+        y:{title:{display:true,text:'Ratio points improved'},ticks:{callback:v=>v>0?`−${v}`:v}},
+        x:{ticks:{font:{size:9},maxRotation:55}}
+      }
+    },
+    plugins:[{id:'zero',afterDraw(chart){
+      const{ctx,chartArea:{left,right},scales:{y}}=chart;
+      const yp=y.getPixelForValue(0);
+      ctx.save();ctx.beginPath();ctx.moveTo(left,yp);ctx.lineTo(right,yp);
+      ctx.strokeStyle='#374151';ctx.lineWidth=1;ctx.stroke();ctx.restore();
+    }}]
+  });
+
+} // end init()
+
+init();
+</script>
+</body>
+</html>

@@ -185,7 +185,7 @@ Add a post like this:
 ---
 title: My first post
 description: A short summary shown in listings and meta tags.
-pubDate: 2024-06-01
+publishedDate: 2024-06-01
 draft: false
 ---
 

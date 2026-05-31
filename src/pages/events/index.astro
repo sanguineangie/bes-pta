@@ -9,17 +9,16 @@ type Post = CollectionEntry<'events'>;
 
 // Fetch all non-draft posts, newest first
 const events = (await getCollection('events', ({ data }) => !data.draft))
-  .sort((a: Post, b: Post) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort((a: Post, b: Post) => b.data.eventDate.valueOf() - a.data.eventDate.valueOf());
 ---
 
 <Layout title="Events" description="All posts">
   <Container class="py-12 sm:py-16 lg:py-24">
     <Sectionhead eyebrow="Content">
       <Fragment slot="title">Events</Fragment>
-      <Fragment slot="desc">All posts, newest first.</Fragment>
+      <Fragment slot="desc">All events, newest first.</Fragment>
     
     </Sectionhead>
-    <button class="btn btn-primary">Create Event</button>
 
     <section class="mt-10 max-w-3xl">
       {events.length === 0 && (
@@ -36,8 +35,8 @@ const events = (await getCollection('events', ({ data }) => !data.draft))
                 <span class="badge badge-primary">{events.data.category}</span>
                 <h2 class="card-title">{events.data.title}</h2>
                 <p class="text-sm text-base-content/70">
-                  <time datetime={events.data.dateEvent.toISOString()}>
-                    {events.data.dateEvent.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  <time datetime={events.data.eventDate.toISOString()}>
+                    {events.data.eventDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
                   </time>
                 </p>
                 <p>{events.data.description}</p>

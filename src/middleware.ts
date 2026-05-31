@@ -31,15 +31,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Store user on locals so pages/actions can access it without re-fetching
   context.locals.user = user;
 
-  // Public routes that don't require authentication
-  const publicPaths = ["/", "/auth/signin", "/auth/signup", "/auth/callback", "/auth/google"];
-  const isPublic =
-    publicPaths.includes(url.pathname) ||
-    url.pathname.startsWith("/api/auth") ||
-    url.pathname.startsWith("/_");
+// Protected routes that require authentication
+  const protectedPaths = ["/dashboard", "/admin"];
+  const isProtected =
+  protectedPaths.some(p => url.pathname.startsWith(p)) ||
+  url.pathname.startsWith("/api/protected");
 
-  // Redirect unauthenticated users away from any non-public page
-  if (!isPublic && !user) {
+  // Redirect unauthenticated users away from protected pages only
+  if (isProtected && !user) {
     return redirect("/auth/signin");
   }
 

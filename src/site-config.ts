@@ -1,5 +1,5 @@
 export const siteConfig = {
-  title: "Bridgeport Elementary School - Parent Teacher Conference",
+  title: "Bridgeport Elementary School - Parent Teacher Committee",
   description: "Parents coming together in support of Bridgeport Elementary School students and the staff and faculty that support their growth.",
   githubRepo: "aholbreich/astro-tailwind-daisyui-starter",
   // Astro validates these public env vars in astro.config.mjs.
@@ -31,7 +31,11 @@ export const nav = [
     url: "/events",
   },
   {
-    text: "Register",
-    url: "/register",
+    text: "Sources",
+    url: "/sources",
   },
+  {
+    text: "Data & Analysis",
+    url: "/analysis",
+  }
 ];

@@ -7,6 +7,9 @@ import Layout from '@layouts/Layout.astro';
 
 // getStaticPaths() tells Astro which URLs to generate at build time.
 // One page is built per non-draft blog post.
+
+export const prerender = true;
+
 export async function getStaticPaths() {
   const posts = await getCollection('events', ({ data }) => !data.draft);
   return posts.map((post: CollectionEntry<'events'>) => ({ params: { id: post.id }, props: { post } }));
@@ -26,7 +29,7 @@ const { Content } = await render(post);
   <Container class="py-12 sm:py-16 lg:py-24">
     <article class="max-w-3xl">
       <header class="space-y-4">
-        <a href="/events" class="link link-hover text-sm text-base-content/60">← All posts</a>
+        <a href="/events" class="link link-hover text-sm text-base-content/60">← All events</a>
 
       <!--
         heroImage is optional. Astro's <Image /> component optimizes the image
@@ -48,13 +51,13 @@ const { Content } = await render(post);
         <div class="space-y-2">
           <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">{post.data.title}</h1>
           <p class="text-sm text-base-content/60">
-            <time datetime={post.data.datePub.toISOString()}>
-              {post.data.datePub.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
+            <time datetime={post.data.publishedDate.toISOString()}>
+              {post.data.eventDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
             </time>
             {post.data.dateMod && (
               <span>
-                · Updated <time datetime={post.data.dateMod.toISOString()}>
-                  {post.data.dateMod.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
+                · Updated <time datetime={post.data.updatedDate.toISOString()}>
+                  {post.data.updatedDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </time>
               </span>
             )}
@@ -71,11 +74,6 @@ const { Content } = await render(post);
         <Content />
 
       </div>
-        <ol>
-            <li>Install Tailwind CSS in your project.</li>
-            <li>Run <code>npm i daisyui</code> to add the library.</li>
-            <li>Add the plugin to your <code>tailwind.config.js</code> file.</li>
-        </ol>
     </article>
   </Container>
   

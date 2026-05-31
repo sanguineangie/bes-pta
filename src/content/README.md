@@ -27,7 +27,7 @@ import { getCollection } from 'astro:content';
 
 // Returns all non-draft entries, sorted by date
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort((a, b) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf());
 ---
 ```
 
