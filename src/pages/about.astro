@@ -1,0 +1,94 @@
+---
+import Container from "@components/elements/Container.astro";
+import Layout from "@layouts/Layout.astro";
+---
+
+<Layout
+  title="About"
+  description="About the UMASD Accountability Project and its author."
+>
+  <Container class="py-12 sm:py-16 lg:py-24">
+    <div class="max-w-2xl space-y-10">
+
+      <div class="space-y-4">
+        <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">About this project</h1>
+        <p class="text-base text-base-content/70 sm:text-lg">
+          An independent, data-driven analysis of Upper Merion Area School District
+          administrative decisions and their impact on students.
+        </p>
+      </div>
+
+    <div class="space-y-4">
+    <h2 class="text-2xl font-bold tracking-tight">Who I am</h2>
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
+        <img
+        src="/images/doug.jpg"
+        alt="Doug Scheesley"
+        class="h-28 w-28 flex-shrink-0 rounded-full object-cover"
+        />
+        <div class="space-y-4">
+        <p class="text-base text-base-content/70">
+            My name is Doug Scheesley. I am a parent of a student at Bridgeport Elementary School 
+            and a chemist by training, with a professional background in data analysis, root cause 
+            analysis, and software engineering. I built this site on my own time, using my own 
+            skills, and at my own expense.
+        </p>
+        <p class="text-base text-base-content/70">
+            This project is not affiliated with the BES PTC, UMASD, or any other organization.
+            The views and analysis presented here are entirely my own, based on publicly available 
+            records and Right to Know data obtained independently and in coordination with other 
+            concerned community members.
+        </p>
+        </div>
+    </div>
+    </div>
+
+      <div class="space-y-4">
+        <h2 class="text-2xl font-bold tracking-tight">Why I did this</h2>
+        <p class="text-base text-base-content/70">
+          In the 2025–26 school year, my child's second grade class reached 28 students —
+          well beyond the 24-student class size guidance the district had established for
+          elementary education. When I sought answers, the explanations offered by district
+          administration did not hold up to scrutiny.
+        </p>
+        <p class="text-base text-base-content/70">
+          I am trained in root cause analysis and have spent my career solving problems by
+          following evidence rather than assumption. I applied that same methodology here.
+          The data the district holds is public record. The analytical techniques are
+          standard. The conclusions follow from the evidence.
+        </p>
+        <p class="text-base text-base-content/70">
+            I built this site because I believe parents and community members deserve access to 
+            clear, honest analysis presented without agenda. If the work here is wrong, I welcome 
+            correction. If it is right, I hope it leads to better outcomes for every student in 
+            the district.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <h2 class="text-2xl font-bold tracking-tight">A note on bias</h2>
+        <p class="text-base text-base-content/70">
+          I am a parent of a student directly impacted by the class size issue analyzed
+          here. Every effort has been made to present the evidence objectively and avoid
+          emotionally charged arguments. Bias is inherent to human nature, and I encourage
+          anyone reading this work to evaluate it critically and on its own merits.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <h2 class="text-2xl font-bold tracking-tight">Contact</h2>
+            <p class="text-base text-base-content/70">
+            You can reach me at{" "}
+            <a href="mailto:douglas.scheesley@gmail.com" class="link link-primary">
+                douglas.scheesley@gmail.com
+            </a>{" "}
+            or find me on{" "}
+            <a href="https://www.linkedin.com/in/douglas-scheesley-48558517/" class="link link-primary" target="_blank" rel="noopener noreferrer">
+                LinkedIn
+            </a>.
+            </p>
+      </div>
+
+    </div>
+  </Container>
+</Layout>

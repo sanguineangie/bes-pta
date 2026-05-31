@@ -1,10 +1,10 @@
 export const siteConfig = {
-  title: "Bridgeport Elementary School - Parent Teacher Committee",
-  description: "Parents coming together in support of Bridgeport Elementary School students and the staff and faculty that support their growth.",
+  title: "UMASD Accountability Project",
+  description: "An independent, data-driven analysis of Upper Merion Area School District administrative decisions and their impact on students.",
   githubRepo: "aholbreich/astro-tailwind-daisyui-starter",
   // Astro validates these public env vars in astro.config.mjs.
   site: import.meta.env.PUBLIC_SITE_URL,
-  footerText: "Replace this with your company or site name.",
+  footerText: "UMASD Accountability Project.",
 
   // Used in SEOmeta for Twitter card and Open Graph
   seo: {
@@ -15,7 +15,7 @@ export const siteConfig = {
 
 // Feature flags examples
 export const featureFlags = {
-  enableImprint: true,
+  enableImprint: false,
   enableDataprotection: false,
   showAttribution: false, // Show starter attribution in the footer if you want it
 };
@@ -37,5 +37,9 @@ export const nav = [
   {
     text: "Data & Analysis",
     url: "/analysis",
+  },
+  {
+    text: "About",
+    url: "/about",
   }
 ];

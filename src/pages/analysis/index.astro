@@ -7,17 +7,34 @@ import Sectionhead from '@components/elements/Sectionhead.astro';
 
 type Post = CollectionEntry<'analysis'>;
 
-// Fetch all non-draft posts, newest first
 const analysis = (await getCollection('analysis', ({ data }) => !data.draft))
   .sort((a: Post, b: Post) => b.data.publishedDate.valueOf() - a.data.publishedDate.valueOf());
+
+// Map status values to badge colors
+function statusBadge(status: string) {
+  switch (status?.toLowerCase()) {
+    case 'supported':    return 'badge-success';
+    case 'unsupported':  return 'badge-error';
+    case 'inconclusive': return 'badge-warning';
+    case 'in progress':  return 'badge-info';
+    default:             return 'badge-neutral';
+  }
+}
+
+function statusLabel(status: string) {
+  switch (status?.toLowerCase()) {
+    case 'unsupported': return "District explanation unsupported";
+    case 'supported':   return "District explanation supported";
+    default:            return status;
+  }
+}
 ---
 
-<Layout title="analysis" description="All posts">
+<Layout title="Data & Analysis" description="All claims, conclusions, and supporting data.">
   <Container class="py-12 sm:py-16 lg:py-24">
     <Sectionhead eyebrow="Content">
       <Fragment slot="title">Data & Analysis</Fragment>
       <Fragment slot="desc">All claims, conclusions, and supporting data.</Fragment>
-    
     </Sectionhead>
 
     <section class="mt-10 max-w-3xl">
@@ -28,21 +45,43 @@ const analysis = (await getCollection('analysis', ({ data }) => !data.draft))
       )}
 
       <ul class="flex flex-col gap-6">
-        {analysis.map((analysis: Post) => (
+        {analysis.map((post: Post) => (
           <li>
-            <a href={`/analysis/${analysis.id}`} class="card border border-base-300 bg-base-100 transition-shadow hover:shadow-md">
-              <div class="card-body gap-3">
-                <h2 class="card-title">Claim: {analysis.data.title}</h2>
-                <span>{analysis.data.status}</span>
-                <p class="text-sm text-base-content/70">
-                  <time datetime={analysis.data.publishedDate.toISOString()}>
-                    {analysis.data.publishedDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}
+            <a
+              href={`/analysis/${post.id}`}
+              class="card border border-base-300 bg-base-100 transition-shadow hover:shadow-md"
+            >
+              <div class="card-body gap-2">
+
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class={`badge badge-sm ${statusBadge(post.data.status)}`}>
+                    {statusLabel(post.data.status)}
+                  </span>
+                  <time
+                    datetime={post.data.publishedDate.toISOString()}
+                    class="text-xs text-base-content/50"
+                  >
+                    {post.data.publishedDate.toLocaleDateString('en', {
+                      year: 'numeric', month: 'long', day: 'numeric'
+                    })}
                   </time>
-                </p>
-                
-                <p>{analysis.data.description}</p>
+                </div>
+
+                <h2 class="card-title text-lg leading-snug">
+                  {post.data.title}
+                </h2>
+
+                {post.data.description && (
+                  <p class="text-sm text-base-content/70">{post.data.description}</p>
+                )}
+
+                {post.data.conclusion && (
+                  <p class="text-sm text-base-content/60 italic">
+                    Conclusion: {post.data.conclusion}
+                  </p>
+                )}
+
               </div>
-              
             </a>
           </li>
         ))}

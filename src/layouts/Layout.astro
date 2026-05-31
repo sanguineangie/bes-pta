@@ -66,6 +66,15 @@ const { title = siteConfig.title, description, image } = Astro.props;
     <a href="#main-content" class="skip-to-content">Skip to content</a>
 
     <Navbar />
+      <div class="border-b border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950">
+        <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+          <p class="text-sm text-amber-800 dark:text-amber-200">
+            <strong>This project is a work in progress.</strong>
+            {" "}The analysis is complete and fully sourced. Additional events, documents,
+            and source material are being added as the project develops.
+          </p>
+        </div>
+      </div>
     <main id="main-content">
       <slot />
     </main>
