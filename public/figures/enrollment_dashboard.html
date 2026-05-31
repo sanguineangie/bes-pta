@@ -54,9 +54,81 @@
     .scenario-table { table-layout: fixed; width: 100%; font-size: 11px; }
     .scenario-table th, .scenario-table td { padding: 4px 5px; white-space: nowrap;
                                               overflow: hidden; text-overflow: ellipsis; }
+    .scenario-table td:first-child,
+    .scenario-table th:first-child { width: 36px; min-width: 36px; }
+    .scenario-table .col-ratio { width: 46px; min-width: 46px; }
+    .scenario-table .col-worst { width: 34px; min-width: 34px; }
+    .scenario-table .col-alloc { width: 24px; min-width: 24px; }
     .scenario-wrap { overflow-x: auto; margin-bottom: 1rem; }
     #loadingMsg { text-align:center; padding: 60px; font-size: 16px; color: #6b7280; }
     #errorMsg   { text-align:center; padding: 60px; font-size: 16px; color: #dc2626; display:none; }
+
+    /* ── Dark mode via prefers-color-scheme ──────────────────────────────── */
+    @media (prefers-color-scheme: dark) {
+      body { color: #e2e8f0; background: #0f172a; }
+      .container { background: #1e293b; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+      h2 { color: #f1f5f9; }
+      .filter-bar { background: #1e293b; border-color: #334155; }
+      .filter-bar label { background: #0f172a; border-color: #334155; color: #cbd5e1; }
+      .filter-bar label:hover { background: #1e293b; }
+      .filter-label { color: #94a3b8; }
+      .filter-sep { background: #334155; }
+      th, td { border-color: #334155; color: #e2e8f0; }
+      th { background: #1e293b; }
+      .school-header { background: #1e3a5f; color: #bfdbfe; }
+      .total-row { background: #1e293b; }
+      .text-muted { color: #94a3b8; }
+      .section-label { color: #93c5fd; border-bottom-color: #1e3a5f; }
+      .note { color: #94a3b8; }
+      .bg-blue   { background: #1e3a5f; color: #bfdbfe; }
+      .bg-green  { background: #14532d; color: #bbf7d0; }
+      .bg-amber  { background: #451a03; color: #fde68a; }
+      .bg-purple { background: #3b0764; color: #e9d5ff; }
+      .bg-rose   { background: #4c0519; color: #fecdd3; }
+      .bg-sky    { background: #0c4a6e; color: #bae6fd; }
+      .bg-indigo { background: #1e1b4b; color: #c7d2fe; }
+      .csr-low  { background: #422006; color: #fef9c3; }
+      .csr-mid  { background: #14532d; color: #dcfce7; }
+      .csr-high { background: #1e3a5f; color: #dbeafe; }
+      .csr-proj { background: #3b0764; color: #f3e8ff; }
+      .redeploy-green  { background: #14532d; color: #86efac; }
+      .redeploy-yellow { background: #451a03; color: #fde68a; }
+      .redeploy-red    { background: #4c0519; color: #fca5a5; }
+      #loadingMsg { color: #94a3b8; }
+    }
+
+    /* ── Dark mode via data-theme (JS-driven toggle) ─────────────────────── */
+    html[data-theme="dark"] body { color: #e2e8f0; background: #0f172a; }
+    html[data-theme="dark"] .container { background: #1e293b; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+    html[data-theme="dark"] h2 { color: #f1f5f9; }
+    html[data-theme="dark"] .filter-bar { background: #1e293b; border-color: #334155; }
+    html[data-theme="dark"] .filter-bar label { background: #0f172a; border-color: #334155; color: #cbd5e1; }
+    html[data-theme="dark"] .filter-bar label:hover { background: #1e293b; }
+    html[data-theme="dark"] .filter-label { color: #94a3b8; }
+    html[data-theme="dark"] .filter-sep { background: #334155; }
+    html[data-theme="dark"] th,
+    html[data-theme="dark"] td { border-color: #334155; color: #e2e8f0; }
+    html[data-theme="dark"] th { background: #1e293b; }
+    html[data-theme="dark"] .school-header { background: #1e3a5f; color: #bfdbfe; }
+    html[data-theme="dark"] .total-row { background: #1e293b; }
+    html[data-theme="dark"] .text-muted { color: #94a3b8; }
+    html[data-theme="dark"] .section-label { color: #93c5fd; border-bottom-color: #1e3a5f; }
+    html[data-theme="dark"] .note { color: #94a3b8; }
+    html[data-theme="dark"] .bg-blue   { background: #1e3a5f; color: #bfdbfe; }
+    html[data-theme="dark"] .bg-green  { background: #14532d; color: #bbf7d0; }
+    html[data-theme="dark"] .bg-amber  { background: #451a03; color: #fde68a; }
+    html[data-theme="dark"] .bg-purple { background: #3b0764; color: #e9d5ff; }
+    html[data-theme="dark"] .bg-rose   { background: #4c0519; color: #fecdd3; }
+    html[data-theme="dark"] .bg-sky    { background: #0c4a6e; color: #bae6fd; }
+    html[data-theme="dark"] .bg-indigo { background: #1e1b4b; color: #c7d2fe; }
+    html[data-theme="dark"] .csr-low  { background: #422006; color: #fef9c3; }
+    html[data-theme="dark"] .csr-mid  { background: #14532d; color: #dcfce7; }
+    html[data-theme="dark"] .csr-high { background: #1e3a5f; color: #dbeafe; }
+    html[data-theme="dark"] .csr-proj { background: #3b0764; color: #f3e8ff; }
+    html[data-theme="dark"] .redeploy-green  { background: #14532d; color: #86efac; }
+    html[data-theme="dark"] .redeploy-yellow { background: #451a03; color: #fde68a; }
+    html[data-theme="dark"] .redeploy-red    { background: #4c0519; color: #fca5a5; }
+    html[data-theme="dark"] #loadingMsg { color: #94a3b8; }
   </style>
 </head>
 <body>
@@ -150,9 +222,6 @@
   </p>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     FIGURE 3 — IDs updated to match the JS exactly
-     ═══════════════════════════════════════════════════════════════════════ -->
 <div class="container" id="figure-3" style="display:none">
   <h2>Figure 3 — Teacher Allocation Scenarios: Worst-Grade Student/Teacher Ratio</h2>
   <p class="note">
@@ -160,7 +229,7 @@
     <strong>Optimal — Actual Teachers</strong> = same headcount redistributed to minimise the worst grade ratio (greedy min-max). &nbsp;
     <strong>Uniform — Max Teachers</strong> = maximum historical total distributed equally across grades. &nbsp;
     <strong>Optimal — Max Teachers</strong> = maximum historical total redistributed optimally.
-    Dashed lines = CSR-based projections (2026-27, 2027-28).
+    Dashed bars = CSR-based projections (2026-27, 2027-28).
   </p>
   <div class="legend-box">
     <div class="legend-item"><div class="legend-swatch" style="background:#ef4444;"></div>Actual Staffing</div>
@@ -168,27 +237,21 @@
     <div class="legend-item"><div class="legend-swatch" style="background:#3b82f6;"></div>Uniform — Max Teachers</div>
     <div class="legend-item"><div class="legend-swatch" style="background:#10b981;"></div>Optimal — Max Teachers</div>
   </div>
-
-  <!-- Main line chart: worst-grade ratio across all scenarios -->
   <div class="section-label">3a. Worst-Grade Max Ratio by Scenario (All Schools)</div>
   <div class="chart-container" style="height:420px;">
     <canvas id="allocationChart"></canvas>
   </div>
-
-  <!-- Ratio-gain bar chart -->
   <div class="section-label">3b. Ratio Points Saved vs Actual (Optimal Max-Staff − Actual)</div>
   <p class="note">Positive = improvement over actual staffing. Negative = actual staffing happened to outperform the optimal max-staff allocation (rare).</p>
   <div class="chart-container" style="height:320px;">
     <canvas id="ratioGainChart"></canvas>
   </div>
-
-  <!-- Per-school scenario tables injected by JS -->
   <div class="section-label">3c. Per-School Allocation Detail</div>
   <div id="allocationTablesContainer"></div>
 </div>
 
 <script>
-// ─── Pure calculation helpers ────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 function stats(arr) {
   const n = arr.length; if (!n) return { mean:0, stdDev:0, rsd:0 };
   const mean = arr.reduce((a,b)=>a+b,0)/n;
@@ -226,8 +289,15 @@ function getCSRRows(school){
       proj1:Math.round(actual*mu),proj2:Math.round(actual*mu*mu)};
   });
 }
-
-// ─── Allocation helpers ───────────────────────────────────────────────────────
+function gradeThreshold(gradeName){
+  const n=gradeName.toLowerCase();
+  if(n.includes('kinder')||n==='k') return 18;
+  const m=n.match(/(\d+)/);
+  if(!m) return 25;
+  const g=parseInt(m[1]);
+  if(g<=2) return 23;
+  return 25;
+}
 function optimalAlloc(enrollments, totalTeachers){
   const n=enrollments.length;
   const t=Array(n).fill(1);
@@ -240,44 +310,64 @@ function optimalAlloc(enrollments, totalTeachers){
   }
   return t;
 }
-function maxRatio(enrollments, alloc){
-  return Math.max(...enrollments.map((e,i)=>e/alloc[i]));
+function maxExcessRatio(gNames, enrollments, alloc){
+  let wi=0, we=-Infinity;
+  enrollments.forEach((e,i)=>{
+    const excess=(e/alloc[i])-gradeThreshold(gNames[i]);
+    if(excess>we){we=excess;wi=i;}
+  });
+  return parseFloat((enrollments[wi]/alloc[wi]).toFixed(2));
 }
 function worstGrade(gNames, enrollments, alloc){
-  let wi=0,wr=0;
-  enrollments.forEach((e,i)=>{const r=e/alloc[i];if(r>wr){wr=r;wi=i;}});
+  let wi=0, we=-Infinity;
+  enrollments.forEach((e,i)=>{
+    const excess=(e/alloc[i])-gradeThreshold(gNames[i]);
+    if(excess>we){we=excess;wi=i;}
+  });
   return gNames[wi];
 }
-function projEnrollments(school, depth){
-  const gNames=Object.keys(school.grades);
-  const csrRows=getCSRRows(school);
-  const lastIdx=6; // years.length - 1; resolved after data loads
-  if(depth===1){
-    return gNames.map((gName,g)=>{
-      if(g===0) return Math.round(stats(school.grades[gName].students).mean);
-      const prev=school.grades[gNames[g-1]].students[lastIdx];
-      return Math.round(prev*csrRows[g].avgCSR);
-    });
+
+// ─── Theme ───────────────────────────────────────────────────────────────────
+// Charts always render on a white background — readable in both light and dark.
+// Only the surrounding page UI (tables, headers, etc.) responds to dark mode.
+// This avoids all iframe/postMessage/Chart.js timing complexity.
+window.addEventListener('message', e => {
+  if(e.data?.type==='theme'){
+    document.documentElement.setAttribute('data-theme', e.data.theme);
   }
-  const d1=projEnrollments(school,1);
-  return gNames.map((gName,g)=>{
-    if(g===0) return Math.round(stats(school.grades[gName].students).mean);
-    return Math.round(d1[g-1]*csrRows[g].avgCSR);
-  });
+});
+// Apply OS preference immediately for standalone use
+if(window.matchMedia('(prefers-color-scheme: dark)').matches){
+  document.documentElement.setAttribute('data-theme','dark');
 }
 
-// ─── Main entry point ─────────────────────────────────────────────────────────
-const params = new URLSearchParams(location.search);
-const figureParam = params.get('figure');
-const targetFigure = figureParam ? `figure-${figureParam}` : '';
+// ─── Chart.js: white canvas background plugin ────────────────────────────────
+// Registered globally so every chart gets a white background drawn before data.
+Chart.register({
+  id:'whiteBg',
+  beforeDraw(chart){
+    const ctx=chart.ctx;
+    ctx.save();
+    ctx.globalCompositeOperation='destination-over';
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,chart.width,chart.height);
+    ctx.restore();
+  }
+});
 
+// ─── URL params ──────────────────────────────────────────────────────────────
+const params=new URLSearchParams(location.search);
+const figureParam=params.get('figure');
+const targetFigure=figureParam?`figure-${figureParam}`:'';
+
+// ─── Init ────────────────────────────────────────────────────────────────────
 async function init(){
   let rawData;
-  try {
-    const res = await fetch('./enrollment.json');
+  try{
+    const res=await fetch('./enrollment.json');
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    rawData = await res.json();
-  } catch(err){
+    rawData=await res.json();
+  }catch(err){
     document.getElementById('loadingMsg').style.display='none';
     const el=document.getElementById('errorMsg');
     el.style.display='block';
@@ -285,25 +375,19 @@ async function init(){
     return;
   }
 
-  const years      = rawData.years;
-  const csrYears   = years.slice(1);
-  const schoolData = rawData.schools;
-  const allGrades  = [...new Set(schoolData.flatMap(s=>Object.keys(s.grades)))];
+  const years=rawData.years;
+  const csrYears=years.slice(1);
+  const schoolData=rawData.schools;
+  const allGrades=[...new Set(schoolData.flatMap(s=>Object.keys(s.grades)))];
 
-  const colors = [
-    '#3b82f6','#f59e0b','#10b981','#8b5cf6','#ef4444',
-    '#06b6d4','#84cc16','#f97316','#ec4899','#14b8a6'
-  ].slice(0,schoolData.length);
-
-  const gradeColors = [
-    '#6366f1','#0ea5e9','#22c55e','#f59e0b','#ef4444',
-    '#a855f7','#14b8a6','#f97316','#84cc16','#ec4899'
-  ].slice(0,allGrades.length);
+  const colors=['#3b82f6','#f59e0b','#10b981','#8b5cf6','#ef4444',
+    '#06b6d4','#84cc16','#f97316','#ec4899','#14b8a6'].slice(0,schoolData.length);
+  const gradeColors=['#6366f1','#0ea5e9','#22c55e','#f59e0b','#ef4444',
+    '#a855f7','#14b8a6','#f97316','#84cc16','#ec4899'].slice(0,allGrades.length);
 
   document.getElementById('loadingMsg').style.display='none';
   ['figure-1','figure-2','figure-3'].forEach(id=>{
-    const show = !targetFigure || id === targetFigure;
-    document.getElementById(id).style.display = show ? '' : 'none';
+    document.getElementById(id).style.display=(!targetFigure||id===targetFigure)?'':'none';
   });
 
   // ── Figure 1 ──────────────────────────────────────────────────────────────
@@ -323,11 +407,9 @@ async function init(){
   });
 
   const fig1Thead=document.getElementById('fig1Thead');
-  fig1Thead.innerHTML=`<tr>
-    <th>School / Grade</th><th>Metric</th>
+  fig1Thead.innerHTML=`<tr><th>School / Grade</th><th>Metric</th>
     ${years.map(y=>`<th>${y}</th>`).join('')}
-    <th class="bg-blue">Mean</th><th class="bg-green">σ</th><th class="bg-amber">%RSD</th>
-  </tr>`;
+    <th class="bg-blue">Mean</th><th class="bg-green">σ</th><th class="bg-amber">%RSD</th></tr>`;
 
   const tbody=document.getElementById('tableBody');
   schoolData.forEach((school)=>{
@@ -542,53 +624,36 @@ async function init(){
     }}]});
 
   // ── Figure 3 ──────────────────────────────────────────────────────────────
-  const allocContainer = document.getElementById('allocationTablesContainer');
-  const abbr = s => s.replace('Kindergarten','K').replace('Grade ','G');
+  const allocContainer=document.getElementById('allocationTablesContainer');
+  const abbr=s=>s.replace('Kindergarten','K').replace('Grade ','G');
+  const allLabels=[],dsActual=[],dsOptActual=[],dsUniformMax=[],dsOptMax=[],isProjArr=[];
+  const nHistYears=years.length;
+  const projYrLabels=['Proj 2026-27','Proj 2027-28'];
 
-  const allLabels   = [];
-  const dsActual    = [], dsOptActual = [], dsUniformMax = [], dsOptMax = [];
-  const isProjArr   = [];   // parallel: true for projected rows
-  const nHistYears  = years.length;
-  const projYrLabels = ['Proj 2026-27','Proj 2027-28'];
+  schoolData.forEach((school,si)=>{
+    const gNames=Object.keys(school.grades);
+    const lastIdx=years.length-1;
+    const maxTeachers=Math.max(...years.map((_,yi)=>gNames.reduce((s,g)=>s+school.grades[g].teachers[yi],0)));
+    const nG=gNames.length;
 
-  schoolData.forEach((school, si) => {
-    const gNames  = Object.keys(school.grades);
-    const color   = colors[si];
-    const lastIdx = years.length - 1;
-
-    const maxTeachers = Math.max(...years.map((_,yi) =>
-      gNames.reduce((s,g) => s + school.grades[g].teachers[yi], 0)
-    ));
-    const nG = gNames.length;
-
-    // ── Historical years ────────────────────────────────────────────────
-    const histData = years.map((_,yi) => {
-      const enr    = gNames.map(g => school.grades[g].students[yi]);
-      const actT   = gNames.map(g => school.grades[g].teachers[yi]);
-      const totalT = actT.reduce((a,b)=>a+b,0);
-      const optT   = optimalAlloc(enr, totalT);
-      const uniMax = Array(nG).fill(Math.floor(maxTeachers/nG));
-      let leftover = maxTeachers - uniMax.reduce((a,b)=>a+b,0);
-      for(let i=0;i<leftover;i++) uniMax[i]++;
-      const optMaxT = optimalAlloc(enr, maxTeachers);
-      return {
-        year: years[yi], isProj: false,
-        enr, actT, optT, uniMax, optMaxT, totalT, maxTeachers,
-        rActual:     parseFloat(maxRatio(enr,actT).toFixed(2)),
-        rOptActual:  parseFloat(maxRatio(enr,optT).toFixed(2)),
-        rUniformMax: parseFloat(maxRatio(enr,uniMax).toFixed(2)),
-        rOptMax:     parseFloat(maxRatio(enr,optMaxT).toFixed(2)),
-        worstActual:     worstGrade(gNames,enr,actT),
-        worstOptActual:  worstGrade(gNames,enr,optT),
-        worstUniMax:     worstGrade(gNames,enr,uniMax),
-        worstOptMax:     worstGrade(gNames,enr,optMaxT),
-      };
+    const histData=years.map((_,yi)=>{
+      const enr=gNames.map(g=>school.grades[g].students[yi]);
+      const actT=gNames.map(g=>school.grades[g].teachers[yi]);
+      const totalT=actT.reduce((a,b)=>a+b,0);
+      const optT=optimalAlloc(enr,totalT);
+      const uniMax=Array(nG).fill(Math.floor(maxTeachers/nG));
+      let lo=maxTeachers-uniMax.reduce((a,b)=>a+b,0);
+      for(let i=0;i<lo;i++) uniMax[i]++;
+      const optMaxT=optimalAlloc(enr,maxTeachers);
+      return{year:years[yi],isProj:false,enr,actT,optT,uniMax,optMaxT,totalT,maxTeachers,
+        rActual:maxExcessRatio(gNames,enr,actT),rOptActual:maxExcessRatio(gNames,enr,optT),
+        rUniformMax:maxExcessRatio(gNames,enr,uniMax),rOptMax:maxExcessRatio(gNames,enr,optMaxT),
+        worstActual:worstGrade(gNames,enr,actT),worstOptActual:worstGrade(gNames,enr,optT),
+        worstUniMax:worstGrade(gNames,enr,uniMax),worstOptMax:worstGrade(gNames,enr,optMaxT)};
     });
 
-    // ── Projected years ─────────────────────────────────────────────────
-    // Override projEnrollments' hardcoded lastIdx with the real one
     function projEnr(depth){
-      const csrRows = getCSRRows(school);
+      const csrRows=getCSRRows(school);
       if(depth===1){
         return gNames.map((gName,g)=>{
           if(g===0) return Math.round(stats(school.grades[gName].students).mean);
@@ -603,202 +668,139 @@ async function init(){
       });
     }
 
-    const projData = [1,2].map(depth => {
-      const enr    = projEnr(depth);
-      const uniMax = Array(nG).fill(Math.floor(maxTeachers/nG));
-      let leftover = maxTeachers - uniMax.reduce((a,b)=>a+b,0);
-      for(let i=0;i<leftover;i++) uniMax[i]++;
-      const optMaxT = optimalAlloc(enr, maxTeachers);
-      const lastActT = gNames.map(g => school.grades[g].teachers[lastIdx]);
-      const lastTotal = lastActT.reduce((a,b)=>a+b,0);
-      const optT = optimalAlloc(enr, lastTotal);
-      return {
-        year: projYrLabels[depth-1], isProj: true,
-        enr, actT: lastActT, optT, uniMax, optMaxT,
-        totalT: lastTotal, maxTeachers,
-        rActual:     parseFloat(maxRatio(enr,lastActT).toFixed(2)),
-        rOptActual:  parseFloat(maxRatio(enr,optT).toFixed(2)),
-        rUniformMax: parseFloat(maxRatio(enr,uniMax).toFixed(2)),
-        rOptMax:     parseFloat(maxRatio(enr,optMaxT).toFixed(2)),
-        worstActual:     worstGrade(gNames,enr,lastActT),
-        worstOptActual:  worstGrade(gNames,enr,optT),
-        worstUniMax:     worstGrade(gNames,enr,uniMax),
-        worstOptMax:     worstGrade(gNames,enr,optMaxT),
-      };
+    const projData=[1,2].map(depth=>{
+      const enr=projEnr(depth);
+      const uniMax=Array(nG).fill(Math.floor(maxTeachers/nG));
+      let lo=maxTeachers-uniMax.reduce((a,b)=>a+b,0);
+      for(let i=0;i<lo;i++) uniMax[i]++;
+      const optMaxT=optimalAlloc(enr,maxTeachers);
+      const lastActT=gNames.map(g=>school.grades[g].teachers[lastIdx]);
+      const lastTotal=lastActT.reduce((a,b)=>a+b,0);
+      const optT=optimalAlloc(enr,lastTotal);
+      return{year:projYrLabels[depth-1],isProj:true,enr,actT:lastActT,optT,uniMax,optMaxT,
+        totalT:lastTotal,maxTeachers,
+        rActual:maxExcessRatio(gNames,enr,lastActT),rOptActual:maxExcessRatio(gNames,enr,optT),
+        rUniformMax:maxExcessRatio(gNames,enr,uniMax),rOptMax:maxExcessRatio(gNames,enr,optMaxT),
+        worstActual:worstGrade(gNames,enr,lastActT),worstOptActual:worstGrade(gNames,enr,optT),
+        worstUniMax:worstGrade(gNames,enr,uniMax),worstOptMax:worstGrade(gNames,enr,optMaxT)};
     });
 
-    const allRows     = [...histData, ...projData];
-    const allYrLabels = allRows.map(r=>`${school.name.substring(0,3)} ${r.year}`);
-
-    allYrLabels.forEach((l,i)=>{
-      allLabels.push(l);
-      dsActual.push(allRows[i].rActual);
-      dsOptActual.push(allRows[i].rOptActual);
-      dsUniformMax.push(allRows[i].rUniformMax);
-      dsOptMax.push(allRows[i].rOptMax);
-      isProjArr.push(allRows[i].isProj);
+    const allRows=[...histData,...projData];
+    allRows.forEach((r,i)=>{
+      allLabels.push(`${school.name.substring(0,3)} ${r.year}`);
+      dsActual.push(r.rActual); dsOptActual.push(r.rOptActual);
+      dsUniformMax.push(r.rUniformMax); dsOptMax.push(r.rOptMax);
+      isProjArr.push(r.isProj);
     });
 
-    // ── Per-school table ─────────────────────────────────────────────────
-    const sec = document.createElement('div');
-    sec.innerHTML = `<div class="section-label">${school.name}
+    const sec=document.createElement('div');
+    sec.innerHTML=`<div class="section-label">${school.name}
       <span style="font-weight:400;font-size:11px;color:#6b7280;margin-left:8px;">
-        Max teachers: ${maxTeachers} &nbsp;|&nbsp; Grades: ${nG}
-      </span></div>`;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'scenario-wrap';
-
-    const tbl = document.createElement('table');
-    tbl.className = 'scenario-table';
-
-    const scenHdr = (label,cls) =>
+        Max teachers: ${maxTeachers} &nbsp;|&nbsp; Grades: ${nG}</span></div>`;
+    const wrap=document.createElement('div');
+    wrap.className='scenario-wrap';
+    const tbl=document.createElement('table');
+    tbl.className='scenario-table';
+    const scenHdr=(label,cls)=>
       `<th colspan="${nG+2}" class="${cls}" style="text-align:center;border-bottom:2px solid #94a3b8;">${label}</th>`;
+    tbl.innerHTML=`<thead><tr>
+      <th rowspan="2" style="min-width:36px;white-space:nowrap;">Year</th>
+      ${scenHdr('Actual Staffing','bg-rose')}
+      ${scenHdr('Optimal — Actual Teachers','bg-amber')}
+      ${scenHdr('Uniform — Max Teachers ('+maxTeachers+')','bg-blue')}
+      ${scenHdr('Optimal — Max Teachers','bg-green')}
+    </tr><tr>
+      ${['bg-rose','bg-amber','bg-blue','bg-green'].map(cls=>
+        gNames.map(g=>`<th class="col-alloc ${cls}" style="text-align:center;font-size:9px;">${abbr(g)}</th>`).join('')
+        +`<th class="col-ratio ${cls}" style="text-align:center;font-size:9px;">Max:1</th>`
+        +`<th class="col-worst ${cls}" style="text-align:center;font-size:9px;">Worst</th>`
+      ).join('')}
+    </tr></thead><tbody></tbody>`;
+    const tbody3=tbl.querySelector('tbody');
 
-    tbl.innerHTML = `<thead>
-      <tr>
-        <th rowspan="2" style="min-width:36px;white-space:nowrap;">Year</th>
-        ${scenHdr('Actual Staffing','bg-rose')}
-        ${scenHdr('Optimal — Actual Teachers','bg-amber')}
-        ${scenHdr('Uniform — Max Teachers ('+maxTeachers+')','bg-blue')}
-        ${scenHdr('Optimal — Max Teachers','bg-green')}
-      </tr>
-      <tr>
-        ${['bg-rose','bg-amber','bg-blue','bg-green'].map(cls=>
-          gNames.map(g=>`<th class="${cls}" style="text-align:center;font-size:9px;">${abbr(g)}</th>`).join('')
-          +`<th class="${cls}" style="text-align:center;font-size:9px;">Max:1</th>`
-          +`<th class="${cls}" style="text-align:center;font-size:9px;">Worst</th>`
-        ).join('')}
-      </tr>
-    </thead><tbody></tbody>`;
-
-    const tbody3 = tbl.querySelector('tbody');
-
-    allRows.forEach((r, ri) => {
-      if(ri === nHistYears){
+    allRows.forEach((r,ri)=>{
+      if(ri===nHistYears){
         const div=document.createElement('tr');
         div.innerHTML=`<td colspan="${1+4*(nG+2)}" style="background:#f1f5f9;font-size:10px;
           font-style:italic;color:#64748b;padding:3px 6px;border-top:2px dashed #94a3b8;">
-          ▼ Projected enrollment (CSR mean) — actual allocation assumes last year's staffing repeats
-        </td>`;
+          ▼ Projected enrollment (CSR mean) — actual allocation assumes last year's staffing repeats</td>`;
         tbody3.appendChild(div);
       }
-
-      const tr = document.createElement('tr');
-      if(r.isProj) tr.style.background = '#f5f3ff';
-
-      const ratioCell = (ratio, worst) => {
-        const col = ratio > 24 ? '#dc2626' : ratio > 20 ? '#d97706' : '#16a34a';
-        const bg  = ratio > 24 ? '#fee2e2' : ratio > 20 ? '#fef3c7' : '#f0fdf4';
-        return `<td style="text-align:center;font-weight:700;background:${bg};color:${col};">${ratio.toFixed(1)}</td>`
-             + `<td style="text-align:center;font-size:10px;color:#64748b;">${abbr(worst)}</td>`;
+      const tr=document.createElement('tr');
+      if(r.isProj) tr.style.background='#f5f3ff';
+      const ratioCell=(ratio,worst)=>{
+        const threshold=gradeThreshold(worst);
+        const over=ratio-threshold;
+        const col=over>0?'#dc2626':over>-3?'#d97706':'#16a34a';
+        const bg=over>0?'#fee2e2':over>-3?'#fef3c7':'#f0fdf4';
+        return `<td class="col-ratio" style="text-align:center;font-weight:700;background:${bg};color:${col};">${ratio.toFixed(1)}<span style="font-size:9px;opacity:0.7">/${threshold}</span></td>`
+          +`<td class="col-worst" style="text-align:center;font-size:10px;color:#64748b;">${abbr(worst)}</td>`;
       };
-
-      const allocCells = (alloc, cls) =>
-        alloc.map(t=>`<td class="${cls}" style="text-align:center;">${t}</td>`).join('');
-
-      const shortYr = s => s.replace(/\d{2}(\d{2})-\d{2}/,'\'$1');
-      const year = r.isProj
-        ? `<em style="color:#7c3aed;">P${shortYr(r.year.replace('Proj ',''))}</em>`
-        : `<b>${shortYr(r.year)}</b>`;
-
-      tr.innerHTML = `<td style="white-space:nowrap;min-width:36px;">${year}</td>`
-        + allocCells(r.actT,   'bg-rose')   + ratioCell(r.rActual,    r.worstActual)
-        + allocCells(r.optT,   'bg-amber')  + ratioCell(r.rOptActual, r.worstOptActual)
-        + allocCells(r.uniMax, 'bg-blue')   + ratioCell(r.rUniformMax,r.worstUniMax)
-        + allocCells(r.optMaxT,'bg-green')  + ratioCell(r.rOptMax,    r.worstOptMax);
-
+      const allocCells=(alloc,cls)=>alloc.map(t=>`<td class="col-alloc ${cls}" style="text-align:center;">${t}</td>`).join('');
+      const shortYr=s=>s.replace(/\d{2}(\d{2})-\d{2}/,'\'$1');
+      const year=r.isProj
+        ?`<em style="color:#7c3aed;">P${shortYr(r.year.replace('Proj ',''))}</em>`
+        :`<b>${shortYr(r.year)}</b>`;
+      tr.innerHTML=`<td style="white-space:nowrap;min-width:36px;">${year}</td>`
+        +allocCells(r.actT,'bg-rose')+ratioCell(r.rActual,r.worstActual)
+        +allocCells(r.optT,'bg-amber')+ratioCell(r.rOptActual,r.worstOptActual)
+        +allocCells(r.uniMax,'bg-blue')+ratioCell(r.rUniformMax,r.worstUniMax)
+        +allocCells(r.optMaxT,'bg-green')+ratioCell(r.rOptMax,r.worstOptMax);
       tbody3.appendChild(tr);
     });
-
     wrap.appendChild(tbl);
     sec.appendChild(wrap);
     allocContainer.appendChild(sec);
   });
 
-  // ── 3a: Grouped bar chart (projected bars are lighter + hatched border) ──
-  // Per-bar colours: solid for historical, semi-transparent for projected
-  function makeBarColors(data, solidHex, projHex){
-    return data.map((_,i) => isProjArr[i] ? projHex : solidHex);
-  }
-  function makeBorderColors(data, solidHex, projHex){
-    return data.map((_,i) => isProjArr[i] ? projHex : solidHex);
-  }
-  function makeBorderWidths(data){
-    return data.map((_,i) => isProjArr[i] ? 2 : 1);
-  }
-  function makeBorderDash(data){
-    // Chart.js grouped bar: borderDash per-bar via scriptable option
-    return (ctx) => isProjArr[ctx.dataIndex] ? [4,3] : [];
-  }
+  function makeBarColors(data,solidHex,projHex){return data.map((_,i)=>isProjArr[i]?projHex:solidHex);}
+  function makeBorderColors(data,solidHex,projHex){return data.map((_,i)=>isProjArr[i]?projHex:solidHex);}
+  function makeBorderWidths(data){return data.map((_,i)=>isProjArr[i]?2:1);}
+  function makeBorderDash(){return ctx=>isProjArr[ctx.dataIndex]?[4,3]:[];}
 
-  new Chart(document.getElementById('allocationChart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: allLabels,
-      datasets: [
-        { label:'Actual Staffing',
-          data: dsActual,
-          backgroundColor: makeBarColors(dsActual,    '#ef4444cc', '#ef444455'),
-          borderColor:      makeBorderColors(dsActual, '#ef4444',   '#ef4444aa'),
-          borderWidth:      makeBorderWidths(dsActual),
-          borderDash:       makeBorderDash(dsActual) },
-        { label:'Optimal — Actual Teachers',
-          data: dsOptActual,
-          backgroundColor: makeBarColors(dsOptActual,    '#f59e0bcc', '#f59e0b55'),
-          borderColor:      makeBorderColors(dsOptActual, '#f59e0b',   '#f59e0baa'),
-          borderWidth:      makeBorderWidths(dsOptActual),
-          borderDash:       makeBorderDash(dsOptActual) },
-        { label:'Uniform — Max Teachers',
-          data: dsUniformMax,
-          backgroundColor: makeBarColors(dsUniformMax,    '#3b82f6cc', '#3b82f655'),
-          borderColor:      makeBorderColors(dsUniformMax, '#3b82f6',   '#3b82f6aa'),
-          borderWidth:      makeBorderWidths(dsUniformMax),
-          borderDash:       makeBorderDash(dsUniformMax) },
-        { label:'Optimal — Max Teachers',
-          data: dsOptMax,
-          backgroundColor: makeBarColors(dsOptMax,    '#10b981cc', '#10b98155'),
-          borderColor:      makeBorderColors(dsOptMax, '#10b981',   '#10b981aa'),
-          borderWidth:      makeBorderWidths(dsOptMax),
-          borderDash:       makeBorderDash(dsOptMax) },
-      ]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        title:{display:true,text:'Worst-Grade Student/Teacher Ratio by Staffing Scenario'},
+  new Chart(document.getElementById('allocationChart').getContext('2d'),{
+    type:'bar',
+    data:{labels:allLabels,datasets:[
+      {label:'Actual Staffing',data:dsActual,
+        backgroundColor:makeBarColors(dsActual,'#ef4444cc','#ef444455'),
+        borderColor:makeBorderColors(dsActual,'#ef4444','#ef4444aa'),
+        borderWidth:makeBorderWidths(dsActual),borderDash:makeBorderDash()},
+      {label:'Optimal — Actual Teachers',data:dsOptActual,
+        backgroundColor:makeBarColors(dsOptActual,'#f59e0bcc','#f59e0b55'),
+        borderColor:makeBorderColors(dsOptActual,'#f59e0b','#f59e0baa'),
+        borderWidth:makeBorderWidths(dsOptActual),borderDash:makeBorderDash()},
+      {label:'Uniform — Max Teachers',data:dsUniformMax,
+        backgroundColor:makeBarColors(dsUniformMax,'#3b82f6cc','#3b82f655'),
+        borderColor:makeBorderColors(dsUniformMax,'#3b82f6','#3b82f6aa'),
+        borderWidth:makeBorderWidths(dsUniformMax),borderDash:makeBorderDash()},
+      {label:'Optimal — Max Teachers',data:dsOptMax,
+        backgroundColor:makeBarColors(dsOptMax,'#10b981cc','#10b98155'),
+        borderColor:makeBorderColors(dsOptMax,'#10b981','#10b981aa'),
+        borderWidth:makeBorderWidths(dsOptMax),borderDash:makeBorderDash()},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{title:{display:true,text:'Worst-Grade Student/Teacher Ratio by Staffing Scenario'},
         legend:{position:'top'},
-        tooltip:{
-          mode:'index', intersect:false,
-          callbacks:{
-            title: items => {
-              const i = items[0]?.dataIndex;
-              return allLabels[i] + (isProjArr[i] ? '  (projected)' : '');
-            },
-            label: ctx => `${ctx.dataset.label}: ${ctx.raw}:1`
-          }
-        }
-      },
-      scales:{
-        y:{title:{display:true,text:'Max Students per Teacher'},ticks:{callback:v=>v+':1'}},
-        x:{ticks:{font:{size:9},maxRotation:55}}
-      }
-    },
-    plugins:[{
-      id:'ref24',afterDraw(chart){
-        const{ctx,chartArea:{left,right},scales:{y}}=chart;
-        const yp=y.getPixelForValue(24);
-        ctx.save();ctx.beginPath();ctx.moveTo(left,yp);ctx.lineTo(right,yp);
-        ctx.strokeStyle='#dc2626';ctx.lineWidth=1.5;ctx.setLineDash([6,3]);ctx.stroke();
-        ctx.setLineDash([]);ctx.fillStyle='#dc2626';ctx.font='10px system-ui';
-        ctx.fillText('24:1 threshold',right-80,yp-4);ctx.restore();
-      }
-    }]
-  });
+        tooltip:{mode:'index',intersect:false,callbacks:{
+          title:items=>{const i=items[0]?.dataIndex;return allLabels[i]+(isProjArr[i]?'  (projected)':'');},
+          label:ctx=>`${ctx.dataset.label}: ${ctx.raw}:1`}}},
+      scales:{y:{title:{display:true,text:'Max Students per Teacher'},ticks:{callback:v=>v+':1'}},
+        x:{ticks:{font:{size:9},maxRotation:55}}}},
+    plugins:[{id:'refThresholds',afterDraw(chart){
+      const{ctx,chartArea:{left,right},scales:{y}}=chart;
+      [{val:18,label:'K: 18',color:'#7c3aed'},{val:23,label:'G1–2: 23',color:'#d97706'},{val:25,label:'G3+: 25',color:'#dc2626'}]
+        .forEach(({val,label,color})=>{
+          const yp=y.getPixelForValue(val);
+          if(yp<chart.chartArea.top||yp>chart.chartArea.bottom) return;
+          ctx.save();ctx.beginPath();ctx.moveTo(left,yp);ctx.lineTo(right,yp);
+          ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.setLineDash([6,3]);ctx.stroke();
+          ctx.setLineDash([]);ctx.fillStyle=color;ctx.font='10px system-ui';
+          ctx.fillText(label,right-62,yp-4);ctx.restore();
+        });
+    }}]});
 
-  // ── 3b: Ratio-gain bar chart ─────────────────────────────────────────────
-  const gainLabels=[], gainData=[], gainColors=[];
-  schoolData.forEach((school,si)=>{
+  const gainLabels=[],gainData=[],gainColors=[];
+  schoolData.forEach((school)=>{
     const gNames=Object.keys(school.grades);
     const lastIdx=years.length-1;
     const maxT=Math.max(...years.map((_,yi)=>gNames.reduce((s,g)=>s+school.grades[g].teachers[yi],0)));
@@ -806,7 +808,7 @@ async function init(){
       const enr=gNames.map(g=>school.grades[g].students[yi]);
       const actT=gNames.map(g=>school.grades[g].teachers[yi]);
       const optMaxT=optimalAlloc(enr,maxT);
-      const gain=maxRatio(enr,actT)-maxRatio(enr,optMaxT);
+      const gain=maxExcessRatio(gNames,enr,actT)-maxExcessRatio(gNames,enr,optMaxT);
       gainLabels.push(`${school.name.substring(0,3)} ${yr}`);
       gainData.push(parseFloat(gain.toFixed(2)));
       gainColors.push(gain>0?'#86efaccc':'#fca5a5cc');
@@ -817,29 +819,21 @@ async function init(){
     type:'bar',
     data:{labels:gainLabels,datasets:[{
       label:'Ratio improvement (Actual → Optimal Max Staff)',
-      data:gainData,
-      backgroundColor:gainColors,
-      borderColor:gainColors.map(c=>c.replace('cc','ff')),
-      borderWidth:1
-    }]},
+      data:gainData,backgroundColor:gainColors,
+      borderColor:gainColors.map(c=>c.replace('cc','ff')),borderWidth:1}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{title:{display:true,text:'Ratio Points Saved vs Actual (Optimal Max-Staff − Actual)'},
         legend:{display:false},
         tooltip:{callbacks:{label:ctx=>`${ctx.raw>0?'−':'+'} ${Math.abs(ctx.raw)} ratio points`}}},
-      scales:{
-        y:{title:{display:true,text:'Ratio points improved'},ticks:{callback:v=>v>0?`−${v}`:v}},
-        x:{ticks:{font:{size:9},maxRotation:55}}
-      }
-    },
+      scales:{y:{title:{display:true,text:'Ratio points improved'},ticks:{callback:v=>v>0?`−${v}`:v}},
+        x:{ticks:{font:{size:9},maxRotation:55}}}},
     plugins:[{id:'zero',afterDraw(chart){
       const{ctx,chartArea:{left,right},scales:{y}}=chart;
       const yp=y.getPixelForValue(0);
       ctx.save();ctx.beginPath();ctx.moveTo(left,yp);ctx.lineTo(right,yp);
       ctx.strokeStyle='#374151';ctx.lineWidth=1;ctx.stroke();ctx.restore();
-    }}]
-  });
-
-} // end init()
+    }}]});
+}
 
 init();
 </script>

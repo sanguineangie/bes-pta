@@ -28,28 +28,9 @@ const { title = siteConfig.title, description, image } = Astro.props;
     <meta name="generator" content={Astro.generator} />
 
     <SEOmeta title={title} description={description} image={image} />
-    <!--
-      Fonts flow:
-      1. astro.config.mjs registers the font and exposes `--font-inter`.
-      2. <Font /> loads that configured family into the page head.
-      3. src/styles/fonts.css maps the variable into Tailwind's `--font-sans`,
-         so DaisyUI components inherit the same font automatically.
-    -->
     <Font cssVariable="--font-inter" preload />
-
-    <!--
-      View Transitions — enables animated, SPA-like page navigation.
-      Remove <ClientRouter /> to revert to standard full-page navigation.
-      Docs: https://docs.astro.build/en/guides/view-transitions/
-    -->
     <ClientRouter />
 
-    <!--
-      Theme init — must run before Alpine boots and before first paint to
-      prevent a flash of the wrong theme. Reads localStorage, then falls back
-      to the OS color-scheme preference, then defaults to 'light'.
-      is:inline keeps this script un-bundled so it executes immediately.
-    -->
     <script is:inline>
       (function () {
         const stored = localStorage.getItem('theme');
@@ -60,24 +41,55 @@ const { title = siteConfig.title, description, image } = Astro.props;
     </script>
   </head>
   <body>
-    <!-- Skip-to-content: first focusable element on the page.
-         Hidden until keyboard-focused so sighted users never see it.
-         Screen readers and keyboard users tab to it and jump past the nav. -->
     <a href="#main-content" class="skip-to-content">Skip to content</a>
 
     <Navbar />
-      <div class="border-b border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950">
-        <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-          <p class="text-sm text-amber-800 dark:text-amber-200">
-            <strong>This project is a work in progress.</strong>
-            {" "}The analysis is complete and fully sourced. Additional events, documents,
-            and source material are being added as the project develops.
-          </p>
-        </div>
+
+    <div class="border-b border-base-300 bg-base-200">
+      <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+        <p class="text-sm text-base-content/70">
+          <strong class="text-base-content">This project is a work in progress.</strong>
+          {" "}The analysis is complete and fully sourced. Additional events, documents,
+          and source material are being added as the project develops.
+        </p>
       </div>
+    </div>
+
     <main id="main-content">
       <slot />
     </main>
     <Footer />
+
+    <script is:inline>
+      function syncIframeThemes(theme) {
+        document.querySelectorAll('iframe').forEach(frame => {
+          try {
+            frame.contentWindow.postMessage({ type: 'theme', theme }, '*');
+          } catch(_) {}
+        });
+      }
+
+      // Read localStorage directly — more reliable than data-theme at page-load
+      // time since Alpine may not have restored it yet
+      function getCurrentTheme() {
+        return localStorage.getItem('theme')
+          || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      }
+
+      document.addEventListener('astro:page-load', () => {
+        // Attach onload to each iframe so theme is pushed as soon as it's ready
+        document.querySelectorAll('iframe').forEach(frame => {
+          frame.onload = () => syncIframeThemes(getCurrentTheme());
+        });
+        // Also push immediately for iframes already loaded (e.g. cached)
+        setTimeout(() => syncIframeThemes(getCurrentTheme()), 50);
+      });
+
+      // Watch for data-theme changes on <html> (Alpine toggle sets this)
+      new MutationObserver(() => syncIframeThemes(getCurrentTheme()))
+        .observe(document.documentElement, {
+          attributes: true, attributeFilter: ['data-theme']
+        });
+    </script>
   </body>
 </html>
