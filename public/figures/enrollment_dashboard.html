@@ -44,9 +44,11 @@
     .legend-box { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; font-size: 11.5px; }
     .legend-item { display: flex; align-items: center; gap: 5px; }
     .legend-swatch { width: 13px; height: 13px; border-radius: 2px; flex-shrink: 0; }
-    .csr-low  { background: #fef9c3; }
-    .csr-mid  { background: #dcfce7; }
-    .csr-high { background: #dbeafe; }
+    .csr-contract-sig  { background: #fee2e2; color: #991b1b; }
+    .csr-contract-mild { background: #fef3c7; color: #92400e; }
+    .csr-stable        { background: #dcfce7; color: #14532d; }
+    .csr-grow-mild     { background: #dbeafe; color: #1e3a8a; }
+    .csr-grow-sig      { background: #ede9fe; color: #3730a3; }
     .csr-proj { background: #f3e8ff; font-style: italic; }
     .redeploy-green  { background: #d1fae5; color: #065f46; font-weight: 600; }
     .redeploy-yellow { background: #fef3c7; color: #92400e; font-weight: 600; }
@@ -87,9 +89,11 @@
       .bg-rose   { background: #4c0519; color: #fecdd3; }
       .bg-sky    { background: #0c4a6e; color: #bae6fd; }
       .bg-indigo { background: #1e1b4b; color: #c7d2fe; }
-      .csr-low  { background: #422006; color: #fef9c3; }
-      .csr-mid  { background: #14532d; color: #dcfce7; }
-      .csr-high { background: #1e3a5f; color: #dbeafe; }
+      .csr-contract-sig  { background: #4c0519; color: #fca5a5; }
+      .csr-contract-mild { background: #451a03; color: #fde68a; }
+      .csr-stable        { background: #14532d; color: #86efac; }
+      .csr-grow-mild     { background: #1e3a5f; color: #bae6fd; }
+      .csr-grow-sig      { background: #2e1065; color: #ddd6fe; }
       .csr-proj { background: #3b0764; color: #f3e8ff; }
       .redeploy-green  { background: #14532d; color: #86efac; }
       .redeploy-yellow { background: #451a03; color: #fde68a; }
@@ -121,9 +125,11 @@
     html[data-theme="dark"] .bg-rose   { background: #4c0519; color: #fecdd3; }
     html[data-theme="dark"] .bg-sky    { background: #0c4a6e; color: #bae6fd; }
     html[data-theme="dark"] .bg-indigo { background: #1e1b4b; color: #c7d2fe; }
-    html[data-theme="dark"] .csr-low  { background: #422006; color: #fef9c3; }
-    html[data-theme="dark"] .csr-mid  { background: #14532d; color: #dcfce7; }
-    html[data-theme="dark"] .csr-high { background: #1e3a5f; color: #dbeafe; }
+    html[data-theme="dark"] .csr-contract-sig  { background: #4c0519; color: #fca5a5; }
+    html[data-theme="dark"] .csr-contract-mild { background: #451a03; color: #fde68a; }
+    html[data-theme="dark"] .csr-stable        { background: #14532d; color: #86efac; }
+    html[data-theme="dark"] .csr-grow-mild     { background: #1e3a5f; color: #bae6fd; }
+    html[data-theme="dark"] .csr-grow-sig      { background: #2e1065; color: #ddd6fe; }
     html[data-theme="dark"] .csr-proj { background: #3b0764; color: #f3e8ff; }
     html[data-theme="dark"] .redeploy-green  { background: #14532d; color: #86efac; }
     html[data-theme="dark"] .redeploy-yellow { background: #451a03; color: #fde68a; }
@@ -173,14 +179,17 @@
     Projections: Y1 = Actual × Avg CSR; Y2 = Y1 × Avg CSR. Kindergarten uses 6-year historical mean.
   </p>
   <div class="legend-box">
-    <div class="legend-item"><div class="legend-swatch csr-low"></div>CSR &lt; 0.95</div>
-    <div class="legend-item"><div class="legend-swatch csr-mid"></div>CSR 0.95–1.05</div>
-    <div class="legend-item"><div class="legend-swatch csr-high"></div>CSR &gt; 1.05</div>
+    <div class="legend-item"><div class="legend-swatch csr-contract-sig"></div>CSR &lt; 0.80 — Significant contraction</div>
+    <div class="legend-item"><div class="legend-swatch csr-contract-mild"></div>CSR 0.80–0.95 — Mild decline</div>
+    <div class="legend-item"><div class="legend-swatch csr-stable"></div>CSR 0.95–1.05 — Stable</div>
+    <div class="legend-item"><div class="legend-swatch csr-grow-mild"></div>CSR 1.05–1.20 — Mild growth</div>
+    <div class="legend-item"><div class="legend-swatch csr-grow-sig"></div>CSR &gt; 1.20 — Significant growth</div>
     <div class="legend-item"><div class="legend-swatch csr-proj"></div>Projected</div>
   </div>
-  <div class="section-label">2a. Grade-Level CSR &amp; 2-Year Projection</div>
+  <div class="section-label">2a. Projection Accuracy — Prior-Year CSR Forecast vs Actual Enrollment</div>
+  <p class="note">Each point compares what the CSR model predicted for a grade (using the prior year's CSR average) against actual enrollment. Closer to zero = more accurate forecast. Demonstrates enrollment predictability across schools and grades.</p>
   <div class="chart-row">
-    <div class="chart-half"><canvas id="csrChart"></canvas></div>
+    <div class="chart-half"><canvas id="projAccuracyChart"></canvas></div>
     <div class="chart-half"><canvas id="projectionChart"></canvas></div>
   </div>
   <div style="overflow-x:auto;">
@@ -265,7 +274,14 @@ function stats(arr) {
   return { mean, stdDev, rsd: mean>0?(stdDev/mean)*100:0 };
 }
 const f1=v=>v.toFixed(1), f2=v=>v.toFixed(2), f3=v=>v.toFixed(3);
-function csrClass(v){ return v==null?'':v<0.95?'csr-low':v<=1.05?'csr-mid':'csr-high'; }
+function csrClass(v){
+  if(v==null) return '';
+  if(v<0.80)  return 'csr-contract-sig';
+  if(v<0.95)  return 'csr-contract-mild';
+  if(v<=1.05) return 'csr-stable';
+  if(v<=1.20) return 'csr-grow-mild';
+  return 'csr-grow-sig';
+}
 function deltaCell(d){ return (d>0?'+':'')+d; }
 function trendArrow(vals){
   const n=vals.length; if(n<2) return '→';
@@ -419,8 +435,11 @@ async function init(){
 
   const fig1Thead=document.getElementById('fig1Thead');
   fig1Thead.innerHTML=`<tr><th>School / Grade</th><th>Metric</th>
-    ${years.map(y=>`<th>${y}</th>`).join('')}
-    <th class="bg-blue">Mean</th><th class="bg-green">σ</th><th class="bg-amber">%RSD</th></tr>`;
+    ${years.map(y=>`<th style="text-align:center;">${y}</th>`).join('')}
+    <th class="bg-blue" style="text-align:center;">Mean</th>
+    <th class="bg-green" style="text-align:center;">Std Dev</th>
+    <th class="bg-amber" style="text-align:center;">%RSD</th>
+    <th class="bg-rose" style="text-align:center;">Threshold</th></tr>`;
 
   const tbody=document.getElementById('tableBody');
   schoolData.forEach((school)=>{
@@ -434,30 +453,76 @@ async function init(){
       const g=school.grades[gName];
       for(let i=0;i<years.length;i++){totS[i]+=g.students[i];totT[i]+=g.teachers[i];}
       const ss=stats(g.students),ts=stats(g.teachers);
+      // Students row
       const sr=document.createElement('tr');
       sr.dataset.school=school.name; sr.dataset.grade=gName; sr.dataset.type='students';
       sr.innerHTML=`<td>${gName}</td><td>Students</td>`
-        +g.students.map(v=>`<td>${v}</td>`).join('')
-        +`<td class="bg-blue">${f1(ss.mean)}</td><td class="bg-green">${f1(ss.stdDev)}</td><td class="bg-amber">${f1(ss.rsd)}%</td>`;
+        +g.students.map(v=>`<td style="text-align:center;">${v}</td>`).join('')
+        +`<td class="bg-blue" style="text-align:center;">${f1(ss.mean)}</td>`
+        +`<td class="bg-green" style="text-align:center;">${f1(ss.stdDev)}</td>`
+        +`<td class="bg-amber" style="text-align:center;">${f1(ss.rsd)}%</td>`
+        +`<td class="bg-rose"></td>`;
       tbody.appendChild(sr);
+      // Teachers row
       const tr=document.createElement('tr');
       tr.className='text-muted'; tr.dataset.school=school.name; tr.dataset.grade=gName; tr.dataset.type='teachers';
       tr.innerHTML=`<td></td><td>Teachers</td>`
-        +g.teachers.map(v=>`<td>${v}</td>`).join('')
-        +`<td class="bg-blue">${f1(ts.mean)}</td><td class="bg-green">${f1(ts.stdDev)}</td><td class="bg-amber">${f1(ts.rsd)}%</td>`;
+        +g.teachers.map(v=>`<td style="text-align:center;">${v}</td>`).join('')
+        +`<td class="bg-blue" style="text-align:center;">${f1(ts.mean)}</td>`
+        +`<td class="bg-green" style="text-align:center;">${f1(ts.stdDev)}</td>`
+        +`<td class="bg-amber" style="text-align:center;">${f1(ts.rsd)}%</td>`
+        +`<td class="bg-rose"></td>`;
       tbody.appendChild(tr);
+      // Ratio row — %RSD calculated, threshold in its own column
+      const thresh=gradeThreshold(gName);
+      const ratios=g.students.map((s,i)=>s/g.teachers[i]);
+      const rs=stats(ratios);
+      const rr=document.createElement('tr');
+      rr.dataset.school=school.name; rr.dataset.grade=gName; rr.dataset.type='ratio';
+      rr.innerHTML=`<td></td><td style="font-style:italic;">Ratio</td>`
+        +ratios.map(v=>{
+          const over=v>thresh;
+          const near=v>thresh-3;
+          const bg=over?'#fee2e2':near?'#fef3c7':'';
+          const col=over?'#dc2626':near?'#d97706':'';
+          const style=bg?`background:${bg};color:${col};font-weight:600;`:'';
+          return `<td style="text-align:center;${style}">${f1(v)}</td>`;
+        }).join('')
+        +`<td class="bg-blue" style="text-align:center;">${f1(rs.mean)}</td>`
+        +`<td class="bg-green" style="text-align:center;">${f1(rs.stdDev)}</td>`
+        +`<td class="bg-amber" style="text-align:center;">${f1(rs.rsd)}%</td>`
+        +`<td class="bg-rose" style="text-align:center;font-weight:600;">≤${thresh}</td>`;
+      tbody.appendChild(rr);
     });
-    const tss=stats(totS),tts=stats(totT);
+    // School total rows
+    const totRatios=totS.map((s,i)=>s/totT[i]);
+    const tss=stats(totS),tts=stats(totT),trs=stats(totRatios);
     const tsRow=document.createElement('tr');
     tsRow.className='total-row'; tsRow.dataset.school=school.name; tsRow.dataset.type='total-students';
-    tsRow.innerHTML=`<td>Total</td><td>Students</td>`+totS.map(v=>`<td>${v}</td>`).join('')
-      +`<td class="bg-blue">${f1(tss.mean)}</td><td class="bg-green">${f1(tss.stdDev)}</td><td class="bg-amber">${f1(tss.rsd)}%</td>`;
+    tsRow.innerHTML=`<td>Total</td><td>Students</td>`+totS.map(v=>`<td style="text-align:center;">${v}</td>`).join('')
+      +`<td class="bg-blue" style="text-align:center;">${f1(tss.mean)}</td>`
+      +`<td class="bg-green" style="text-align:center;">${f1(tss.stdDev)}</td>`
+      +`<td class="bg-amber" style="text-align:center;">${f1(tss.rsd)}%</td>`
+      +`<td class="bg-rose"></td>`;
     tbody.appendChild(tsRow);
     const ttRow=document.createElement('tr');
     ttRow.className='total-row text-muted'; ttRow.dataset.school=school.name; ttRow.dataset.type='total-teachers';
-    ttRow.innerHTML=`<td></td><td>Teachers</td>`+totT.map(v=>`<td>${v}</td>`).join('')
-      +`<td class="bg-blue">${f1(tts.mean)}</td><td class="bg-green">${f1(tts.stdDev)}</td><td class="bg-amber">${f1(tts.rsd)}%</td>`;
+    ttRow.innerHTML=`<td></td><td>Teachers</td>`+totT.map(v=>`<td style="text-align:center;">${v}</td>`).join('')
+      +`<td class="bg-blue" style="text-align:center;">${f1(tts.mean)}</td>`
+      +`<td class="bg-green" style="text-align:center;">${f1(tts.stdDev)}</td>`
+      +`<td class="bg-amber" style="text-align:center;">${f1(tts.rsd)}%</td>`
+      +`<td class="bg-rose"></td>`;
     tbody.appendChild(ttRow);
+    // School-level aggregate ratio row
+    const trRow=document.createElement('tr');
+    trRow.className='total-row'; trRow.dataset.school=school.name; trRow.dataset.type='total-ratio';
+    trRow.innerHTML=`<td></td><td style="font-style:italic;">Ratio</td>`
+      +totRatios.map(v=>`<td style="text-align:center;">${f1(v)}</td>`).join('')
+      +`<td class="bg-blue" style="text-align:center;">${f1(trs.mean)}</td>`
+      +`<td class="bg-green" style="text-align:center;">${f1(trs.stdDev)}</td>`
+      +`<td class="bg-amber" style="text-align:center;">${f1(trs.rsd)}%</td>`
+      +`<td class="bg-rose" style="text-align:center;font-size:10px;">mixed</td>`;
+    tbody.appendChild(trRow);
   });
 
   let fig1Chart=null;
@@ -517,8 +582,8 @@ async function init(){
       if(!sch){show=true;}
       else if(!selSchools.includes(sch)){show=false;}
       else if(typ==='header'){show=true;}
-      else if(gradeMode==='total'){show=(typ==='total-students'||typ==='total-teachers');}
-      else{show=(typ==='students'||typ==='teachers')&&selGrades.includes(grd);}
+      else if(gradeMode==='total'){show=(typ==='total-students'||typ==='total-teachers'||typ==='total-ratio');}
+      else{show=(typ==='students'||typ==='teachers'||typ==='ratio')&&selGrades.includes(grd);}
       row.classList.toggle('row-hidden',!show);
     });
   }
@@ -533,10 +598,9 @@ async function init(){
 
   // ── Figure 2 ──────────────────────────────────────────────────────────────
   const csrTbody=document.getElementById('csrTableBody');
-  const allTransitions=[],csrBarData={},projLabels=[],actualArr=[],proj1Arr=[],proj2Arr=[];
+  const allTransitions=[],projLabels=[],actualArr=[],proj1Arr=[],proj2Arr=[];
   schoolData.forEach((school)=>{
     const rows=getCSRRows(school);
-    csrBarData[school.name]={};
     const hdr=document.createElement('tr');
     hdr.className='school-header';
     hdr.innerHTML=`<td colspan="14">${school.name}</td>`;
@@ -559,21 +623,66 @@ async function init(){
       csrTbody.appendChild(tr);
       const lbl=`${school.name.substring(0,3)}. ${r.transition.split('→')[1]?.trim()||'K'}`;
       if(!allTransitions.includes(r.transition))allTransitions.push(r.transition);
-      if(!r.isKinder)csrBarData[school.name][r.transition]=r.avgCSR;
       projLabels.push(lbl); actualArr.push(r.actual); proj1Arr.push(r.proj1); proj2Arr.push(r.proj2);
     });
   });
 
-  new Chart(document.getElementById('csrChart').getContext('2d'),{type:'bar',
-    data:{labels:allTransitions.filter(t=>!t.startsWith('New')),
-      datasets:schoolData.map((s,si)=>({label:`${s.name} Avg CSR`,
-        data:allTransitions.filter(t=>!t.startsWith('New')).map(t=>csrBarData[s.name][t]??null),
-        backgroundColor:colors[si]+'bb',borderColor:colors[si],borderWidth:1}))},
+  // ── Build projection accuracy data ─────────────────────────────────────
+  // For each non-K grade, for each year yi >= 2 (need prior year's CSR avg):
+  // predicted = prev_grade_enrollment[yi-1] * avgCSR_up_to_(yi-1)
+  // actual    = curr_grade_enrollment[yi]
+  // error     = actual - predicted
+  const accLabels=[], accData=[], accColors=[];
+  schoolData.forEach((school,si)=>{
+    const gNames=Object.keys(school.grades);
+    gNames.forEach((gName,g)=>{
+      if(g===0) return; // skip K
+      const curr=school.grades[gName].students;
+      const prev=school.grades[gNames[g-1]].students;
+      // Need at least 2 prior years to compute a rolling avgCSR
+      for(let yi=2;yi<years.length;yi++){
+        // avgCSR from years 1..yi-1
+        const historicCSRs=[];
+        for(let k=1;k<yi;k++) historicCSRs.push(curr[k]/prev[k-1]);
+        const avgCSR=historicCSRs.reduce((a,b)=>a+b,0)/historicCSRs.length;
+        const predicted=Math.round(prev[yi-1]*avgCSR);
+        const actual=curr[yi];
+        const error=actual-predicted;
+        accLabels.push(`${school.name.substring(0,3)} ${years[yi]} ${gName.replace('Grade ','G')}`);
+        accData.push(error);
+        accColors.push(error>0?'#3b82f6cc':'#ef4444cc');
+      }
+    });
+  });
+
+  new Chart(document.getElementById('projAccuracyChart').getContext('2d'),{type:'bar',
+    data:{labels:accLabels,datasets:[{
+      label:'Forecast Error (Actual − Predicted)',
+      data:accData,
+      backgroundColor:accColors,
+      borderColor:accColors.map(c=>c.replace('cc','ff')),
+      borderWidth:1}]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{title:{display:true,text:'Average CSR by Grade Transition'},legend:{position:'top'},
-        tooltip:{mode:'index',intersect:false}},
-      scales:{y:{min:0.80,max:1.25,title:{display:true,text:'Avg CSR'},ticks:{callback:v=>v.toFixed(2)}},
-        x:{ticks:{font:{size:10}}}}}});
+      plugins:{
+        title:{display:true,text:'CSR Forecast Error by School, Grade & Year'},
+        legend:{display:false},
+        tooltip:{callbacks:{
+          title:items=>accLabels[items[0].dataIndex],
+          label:ctx=>`Error: ${ctx.raw>0?'+':''}${ctx.raw} students (${ctx.raw>0?'under':'over'}-predicted)`
+        }}
+      },
+      scales:{
+        y:{title:{display:true,text:'Students (Actual − Predicted)'},
+           ticks:{callback:v=>v>0?`+${v}`:v}},
+        x:{display:false}
+      }
+    },
+    plugins:[{id:'zero2a',afterDraw(chart){
+      const{ctx,chartArea:{left,right},scales:{y}}=chart;
+      const yp=y.getPixelForValue(0);
+      ctx.save();ctx.beginPath();ctx.moveTo(left,yp);ctx.lineTo(right,yp);
+      ctx.strokeStyle='#374151';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+    }}]});
 
   new Chart(document.getElementById('projectionChart').getContext('2d'),{type:'bar',
     data:{labels:projLabels,datasets:[
@@ -857,6 +966,15 @@ async function init(){
 }
 
 init();
+
+// ─── Auto-resize: report content height to parent so iframe never scrolls ────
+function reportHeight(){
+  const h = document.body.scrollHeight;
+  window.parent.postMessage({ type:'iframeHeight', height: h }, '*');
+}
+// Report after init renders all content, and whenever layout changes
+window.addEventListener('load', reportHeight);
+new ResizeObserver(reportHeight).observe(document.body);
 </script>
 </body>
 </html>

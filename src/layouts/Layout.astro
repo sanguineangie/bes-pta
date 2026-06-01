@@ -90,6 +90,19 @@ const { title = siteConfig.title, description, image } = Astro.props;
         .observe(document.documentElement, {
           attributes: true, attributeFilter: ['data-theme']
         });
+
+      // Auto-resize iframes to their content height — eliminates scroll-within-scroll
+      window.addEventListener('message', e => {
+        if(e.data?.type === 'iframeHeight'){
+          document.querySelectorAll('iframe').forEach(frame => {
+            try {
+              if(frame.contentWindow === e.source){
+                frame.style.height = (e.data.height + 32) + 'px';
+              }
+            } catch(_) {}
+          });
+        }
+      });
     </script>
   </body>
 </html>
